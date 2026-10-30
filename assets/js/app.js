@@ -1698,6 +1698,26 @@ async function saveSheetImage(lesson) {
   const me = readJSON(ME_KEY);
   const who = [me.ban && `6학년 ${me.ban}반`, me.group && `${me.group}모둠`, me.name].filter(Boolean).join(" ");
   await saveNotesImage(lesson, sheetAnswers(lesson), { title: `${lesson.title} — 활동지`, who, file: `활동지${me.name ? `_${me.name}` : ""}` });
+  earnSheetBadge(lesson);
+}
+
+// 성장 MAP: 활동지를 그림으로 저장하면(= 활동지를 끝내 제출할 준비가 되면) 그 차시 배지를 줌 (학생용 화면만)
+function earnSheetBadge(lesson) {
+  if (!isStudent || !lesson.badge) return;
+  const unit = units.find((u) => u.lessons.includes(lesson));
+  if (!unit) return;
+  const map = readEarned();
+  const key = badgeKey(cid, unit, lesson);
+  if (map[key]) return;
+  map[key] = new Date().toISOString().slice(0, 10);
+  if (!writeEarned(map)) return;
+  celebrate(lesson);
+  const head = document.querySelector(".lesson-title");
+  head?.classList.remove("not-earned");
+  if (head && !head.querySelector(".badge-note")) {
+    head.querySelector("div")?.insertAdjacentHTML("beforeend", `<p class="badge-note is-done">배지를 모았어요. <a href="#/badges">내 배지 보기</a></p>`);
+  }
+  updateBadgeLink();
 }
 
 /* ---------- PPT 수업 모드: 슬라이드를 넘기다 활동지를 띄움 ---------- */
