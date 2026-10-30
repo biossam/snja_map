@@ -42,7 +42,10 @@
    "url": "https://creativecommons.org/licenses/by-nc/4.0/deed.ko",
    "footer": "그래프에 쓴 통계의 출처는 각 그래프 아래에 적었습니다."
   },
-  "slideCourse": true
+  "slideCourse": true,
+  "credits": [
+   "차시 배지: Google Gemini로 생성한 이미지"
+  ]
  },
  "units": [
   {
@@ -52,6 +55,7 @@
     {
      "no": 1,
      "title": "무역이 뭐예요?",
+     "badge": "assets/img/badges/1.png",
      "topic": "내 물건은 어느 나라에서 왔을까요?",
      "stage": "M 동기",
      "pages": "사회 86~89쪽",
@@ -309,6 +313,7 @@
     {
      "no": 2,
      "title": "나라마다 가진 게 달라요",
+     "badge": "assets/img/badges/2.png",
      "topic": "나라마다 많이 가진 것은 왜 다를까요?",
      "stage": "A 성찰",
      "pages": "사회 90~91쪽",
@@ -698,6 +703,7 @@
     {
      "no": 3,
      "title": "바꾸면 더 좋아요",
+     "badge": "assets/img/badges/3.png",
      "topic": "혼자 다 만들기와 나눠서 바꾸기, 어느 쪽이 더 많을까요?",
      "stage": "A 성찰",
      "pages": "사회 92~93쪽",
@@ -1226,6 +1232,7 @@
     {
      "no": 5,
      "title": "우리나라 무역 그래프 읽기",
+     "badge": "assets/img/badges/5.png",
      "topic": "우리나라는 무엇을 많이 팔고 무엇을 많이 사 올까요?",
      "stage": "P 맞춤",
      "pages": "사회 96~97쪽",
@@ -1426,6 +1433,7 @@
     {
      "no": 6,
      "title": "스마트폰을 만들어라!",
+     "badge": "assets/img/badges/6.png",
      "topic": "다른 나라에 기대는 건 좋을까, 위험할까?",
      "stage": "환류",
      "pages": "사회 98~101쪽",

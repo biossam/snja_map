@@ -1021,7 +1021,7 @@ async function renderBadges() {
   app.innerHTML = `
     <section class="intro badges-intro">
       <h1>내 배지</h1>
-      <p class="intro-note">수업 영상을 보며 모은 배지예요. 지금까지 ${total}개를 모았어요.
+      <p class="intro-note">활동지를 끝내고 "활동지 그림으로 저장"을 누르면 받는 배지예요. 지금까지 ${total}개를 모았어요.
         배지 기록은 이 기기에만 남아요.</p>
     </section>
     ${blocks}
