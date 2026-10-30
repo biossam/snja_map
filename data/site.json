@@ -1,0 +1,13 @@
+{
+  "site": {
+    "title": "성장 MAP",
+    "default": "growthmap"
+  },
+  "courses": [
+    {
+      "id": "growthmap",
+      "title": "성장 MAP",
+      "file": "data/course.json"
+    }
+  ]
+}
