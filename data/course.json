@@ -9,31 +9,38 @@
   "points": [
    {
     "name": "원산지 탐정",
-    "desc": "수출·수입을 바르게 구분"
+    "desc": "수출·수입을 바르게 구분",
+    "img": "assets/img/points/origin.png"
    },
    {
     "name": "근거 말하기",
-    "desc": "\"왜냐하면\"으로 까닭을 말함"
+    "desc": "\"왜냐하면\"으로 까닭을 말함",
+    "img": "assets/img/points/reason.png"
    },
    {
     "name": "분업의 달인",
-    "desc": "실험 결과로 무역의 이유 설명"
+    "desc": "실험 결과로 무역의 이유 설명",
+    "img": "assets/img/points/division.png"
    },
    {
     "name": "균형 판단가",
-    "desc": "좋은 점과 걱정을 함께 말함"
+    "desc": "좋은 점과 걱정을 함께 말함",
+    "img": "assets/img/points/balance.png"
    },
    {
     "name": "데이터 탐정",
-    "desc": "그래프로 AI 답 확인"
+    "desc": "그래프로 AI 답 확인",
+    "img": "assets/img/points/data.png"
    },
    {
     "name": "위기 극복",
-    "desc": "거래 나라를 바꿔 위기를 이겨 냄"
+    "desc": "거래 나라를 바꿔 위기를 이겨 냄",
+    "img": "assets/img/points/crisis.png"
    },
    {
     "name": "도움 나라",
-    "desc": "다른 나라가 만들도록 도움"
+    "desc": "다른 나라가 만들도록 도움",
+    "img": "assets/img/points/help.png"
    }
   ],
   "license": {
@@ -44,7 +51,13 @@
   },
   "slideCourse": true,
   "credits": [
-   "차시 배지: Google Gemini로 생성한 이미지"
+   "차시 배지·칭찬포인트 배지: Google Gemini로 생성한 이미지"
+  ],
+  "teacherLinks": [
+   {
+    "title": "칭찬포인트 배지 그림 받기",
+    "url": "files/points/칭찬포인트_배지.zip"
+   }
   ]
  },
  "units": [
@@ -271,27 +284,33 @@
           "options": [
            {
             "name": "원산지 탐정",
-            "desc": "수출·수입을 바르게 구분해요"
+            "desc": "수출·수입을 바르게 구분해요",
+            "img": "assets/img/points/origin.png"
            },
            {
             "name": "분업의 달인",
-            "desc": "실험 결과로 무역의 이유를 설명해요"
+            "desc": "실험 결과로 무역의 이유를 설명해요",
+            "img": "assets/img/points/division.png"
            },
            {
             "name": "균형 판단가",
-            "desc": "좋은 점과 걱정되는 점을 함께 말해요"
+            "desc": "좋은 점과 걱정되는 점을 함께 말해요",
+            "img": "assets/img/points/balance.png"
            },
            {
             "name": "데이터 탐정",
-            "desc": "그래프로 AI 대답이 맞는지 확인해요"
+            "desc": "그래프로 AI 대답이 맞는지 확인해요",
+            "img": "assets/img/points/data.png"
            },
            {
             "name": "근거 말하기",
-            "desc": "\"왜냐하면\"으로 까닭을 말해요"
+            "desc": "\"왜냐하면\"으로 까닭을 말해요",
+            "img": "assets/img/points/reason.png"
            },
            {
             "name": "도움 나라",
-            "desc": "다른 나라가 만들 수 있게 도와요"
+            "desc": "다른 나라가 만들 수 있게 도와요",
+            "img": "assets/img/points/help.png"
            }
           ]
          },
@@ -1001,6 +1020,7 @@
     {
      "no": 4,
      "title": "좋은 점, 걱정되는 점",
+     "badge": "assets/img/badges/4.png",
      "topic": "무역은 좋기만 할까요?",
      "stage": "A 성찰",
      "pages": "사회 94~95쪽",

@@ -991,3 +991,15 @@ a.ri-head:focus-visible, .ri-btn:focus-visible { outline: 3px solid var(--accent
 .sm-slide { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
 .sm-slide img { max-height: 100%; max-width: 100%; object-fit: contain; }
 .sm-sheet-view { flex: 1; }
+/* 칭찬포인트 배지 */
+.points ul { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 4px; }
+.points li { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0; border: 0; background: none; border-radius: 0; text-align: center; }
+.points li img { width: auto; height: 64px; filter: drop-shadow(0 2px 3px rgba(11, 11, 69, .18)); transition: transform .2s var(--ease); }
+.points li:hover img { transform: rotate(-6deg) scale(1.06); }
+.points li b { font-size: 0.6875rem; line-height: 1.3; color: var(--ink-2); }
+@media (max-width: 899px) { .points ul { grid-template-columns: repeat(7, 1fr); } }
+@media (max-width: 599px) { .points ul { grid-template-columns: repeat(4, 1fr); } }
+.sh-card { align-items: center; text-align: center; }
+.sh-card img { width: auto; height: 84px; filter: grayscale(.8); opacity: .65; transition: filter .2s, opacity .2s, transform .2s var(--ease); }
+.sh-card[aria-pressed="true"] img { filter: drop-shadow(0 3px 4px rgba(11, 11, 69, .25)); opacity: 1; transform: rotate(-6deg) scale(1.08); }
+.sh-card[aria-pressed="true"] b::before { content: ""; }

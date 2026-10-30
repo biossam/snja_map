@@ -372,7 +372,7 @@ function renderHome() {
           ? (course.slideCourse ? `${LW()}를 골라 PPT를 다시 보고 활동지에 바로 쓸 수 있어요.` : `${LW()}${LW() === "편" ? "을" : "를"} 골라 수업 영상을 다시 볼 수 있어요.`)
           : course.slideCourse ? `${LW()}마다 수업 PPT와 활동지를 내려받고, 수업 모드에서 PPT와 활동지를 함께 띄울 수 있습니다.` : (course.noWorksheet ? `${LW()}마다 수업 영상을 파트별로 보며 활동할 수 있습니다.` : `${LW()}마다 수업 영상을 보고 활동지를 무료로 받을 수 있습니다.`)}</p>
       ${course.keyQuestion ? `<div class="key-question"><span>핵심 질문</span>${esc(course.keyQuestion)}</div>` : ""}
-      ${(course.points ?? []).length ? `<div class="points"><p class="points-title">모아 보는 칭찬포인트</p><ul>${course.points.map((x) => `<li title="${esc(x.desc || "")}"><b>${esc(x.name)}</b><small>${esc(x.desc || "")}</small></li>`).join("")}</ul></div>` : ""}
+      ${(course.points ?? []).length ? `<div class="points"><p class="points-title">모아 보는 칭찬포인트</p><ul>${course.points.map((x) => `<li title="${esc(x.desc || "")}">${x.img ? `<img src="${esc(x.img)}" alt="" width="60" height="72" loading="lazy">` : ""}<b>${esc(x.name)}</b><small>${esc(x.desc || "")}</small></li>`).join("")}</ul></div>` : ""}
       ${isStudent ? "" : `<a class="text-link" href="${homeHref()}/qr">학생용 QR 코드 보기</a>`}
       ${isStudent ? "" : (course.teacherLinks ?? []).map((l) => safeUrl(l.url)
         ? `<a class="text-link teacher-link" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.title)}</a>` : "").join("")}
@@ -1545,7 +1545,7 @@ function sheetHtml(lesson, opts = {}) {
       case "cards": {
         const sel = v(id);
         return `<div class="sh-field"><span class="sh-label">${esc(it.label)}</span><div class="sh-cards">${it.options.map((o, k) =>
-          `<button type="button" class="sh-card" data-choice="${id}" data-k="${k}" aria-pressed="${sel === k}"><b>${esc(o.name)}</b><small>${esc(o.desc || "")}</small></button>`).join("")}</div></div>`;
+          `<button type="button" class="sh-card" data-choice="${id}" data-k="${k}" aria-pressed="${sel === k}">${o.img ? `<img src="${esc(o.img)}" alt="" width="70" height="84" loading="lazy">` : ""}<b>${esc(o.name)}</b><small>${esc(o.desc || "")}</small></button>`).join("")}</div></div>`;
       }
       case "scale": {
         return `<table class="sh-table sh-scale"><thead><tr><th>점검할 내용</th>${it.options.map((o) => `<th>${esc(o)}</th>`).join("")}</tr></thead><tbody>
