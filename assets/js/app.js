@@ -66,7 +66,7 @@ const fileVideo = (v, attrs = "") => `<video${attrs} src="${esc(vidFile(v))}"${v
 
 function teacherFileCount(lesson) {
   const t = lesson.teacher ?? {};
-  return [t.worksheet].filter(Boolean).length;
+  return [t.worksheet, t.ppt].filter(Boolean).length;
 }
 
 /* ---------- 배지 모으기 (학생용 화면만) ----------
@@ -101,6 +101,8 @@ function lessonStatus(lesson) {
   const f = teacherFileCount(lesson);
   const parts = [];
   const np = (lesson.videos ?? []).reduce((n, x) => n + (x.parts?.length ?? 0), 0);
+  if (lesson.slides?.count) parts.push(`PPT ${lesson.slides.count}장`);
+  if (lesson.sheet?.parts?.length) parts.push("활동지");
   if (np) parts.push(`파트 ${np}개`);
   else if (v) parts.push(`영상 ${v}개`);
   if (f && !isStudent) parts.push(`자료 ${f}개`);
@@ -351,7 +353,7 @@ function renderHome() {
                 ${lesson.stage ? `<span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}
                 <span class="step-status">${esc(lessonStatus(lesson))}</span>
               </span>
-              ${thumbId ? `<img class="step-thumb" src="${thumbOf(vids[0])}" alt="" loading="lazy">` : ""}
+              ${thumbId ? `<img class="step-thumb" src="${thumbOf(vids[0])}" alt="" loading="lazy">` : lesson.slides?.count ? `<img class="step-thumb is-slide" src="${esc(slideSrc(lesson, 1))}" alt="" loading="lazy">` : ""}
             </a>${strip}
           </li>`;
         }).join("")}
@@ -367,8 +369,8 @@ function renderHome() {
       ${course.tagline ? `<p class="lede">${esc(course.tagline)}</p>` : ""}
       <p class="intro-note">${[course.grade, course.subject].filter(Boolean).map(esc).join(" ")}${course.grade || course.subject ? ", " : ""}${lessonCount}${LW()}${course.author ? ` · ${esc(course.author)}` : ""}.
         ${isStudent
-          ? `${LW()}${LW() === "편" ? "을" : "를"} 골라 수업 영상을 다시 볼 수 있어요.`
-          : (course.noWorksheet ? `${LW()}마다 수업 영상을 파트별로 보며 활동할 수 있습니다.` : `${LW()}마다 수업 영상을 보고 활동지를 무료로 받을 수 있습니다.`)}</p>
+          ? (course.slideCourse ? `${LW()}를 골라 PPT를 다시 보고 활동지에 바로 쓸 수 있어요.` : `${LW()}${LW() === "편" ? "을" : "를"} 골라 수업 영상을 다시 볼 수 있어요.`)
+          : course.slideCourse ? `${LW()}마다 수업 PPT와 활동지를 내려받고, 수업 모드에서 PPT와 활동지를 함께 띄울 수 있습니다.` : (course.noWorksheet ? `${LW()}마다 수업 영상을 파트별로 보며 활동할 수 있습니다.` : `${LW()}마다 수업 영상을 보고 활동지를 무료로 받을 수 있습니다.`)}</p>
       ${course.keyQuestion ? `<div class="key-question"><span>핵심 질문</span>${esc(course.keyQuestion)}</div>` : ""}
       ${(course.points ?? []).length ? `<div class="points"><p class="points-title">모아 보는 칭찬포인트</p><ul>${course.points.map((x) => `<li title="${esc(x.desc || "")}"><b>${esc(x.name)}</b><small>${esc(x.desc || "")}</small></li>`).join("")}</ul></div>` : ""}
       ${isStudent ? "" : `<a class="text-link" href="${homeHref()}/qr">학생용 QR 코드 보기</a>`}
@@ -491,7 +493,8 @@ function teacherSection(lesson) {
   const t = lesson.teacher ?? {};
   // course.noWorksheet: 활동지가 없는 교재는 활동지 칸을 보여 주지 않음
   const files = course.noWorksheet ? [] : [
-    { label: "수업 활동지", url: t.worksheet },
+    ...(t.ppt || lesson.slides ? [{ label: "수업 PPT", url: t.ppt, kind: "PowerPoint" }] : []),
+    { label: "수업 활동지", url: t.worksheet, kind: "Word" },
   ];
   const items = files.map((f) => {
     const url = safeUrl(f.url);
@@ -500,7 +503,7 @@ function teacherSection(lesson) {
     const ext = local ? (String(f.url).match(/\.[a-z0-9]+$/i)?.[0] ?? "") : "";
     const dl = local ? ` download="${esc(`${course.title}_${lesson.no}${LW()}_${f.label}${ext}`)}"` : "";
     return url
-      ? `<li><a class="file" href="${esc(url)}"${dl} target="_blank" rel="noopener">${icon.download}<span>${f.label}</span><span class="format">받기</span></a></li>`
+      ? `<li><a class="file" href="${esc(url)}"${dl} target="_blank" rel="noopener">${icon.download}<span>${f.label}</span><span class="format">${f.kind ? `${f.kind} ` : ""}받기</span></a></li>`
       : `<li><span class="file is-empty" aria-disabled="true">${icon.download}<span>${f.label}</span><span class="format">준비 중</span></span></li>`;
   }).join("");
 
@@ -551,7 +554,8 @@ function renderLesson(unitId, no, pick = 0) {
     isStudent ? "" : listSection("생각해 볼 질문", lesson.questions),
   ].join("");
 
-  const canClassMode = !isStudent && (lesson.videos?.length || lesson.steps?.length);
+  const canClassMode = !isStudent && (lesson.slides?.count || lesson.videos?.length || lesson.steps?.length);
+  const deck = slideViewer(lesson);
 
   app.innerHTML = `
     <nav class="crumb"><a href="${homeHref()}">${esc(course.title)}</a>${units.length > 1 ? ` <span>/</span> ${esc(unit.title)}` : ""}</nav>
@@ -569,17 +573,20 @@ function renderLesson(unitId, no, pick = 0) {
       ${canClassMode ? `<button class="btn-primary" id="class-mode" type="button">${icon.screen}수업 모드</button>` : ""}
     </header>
 
-    ${videos ? `<div class="videos">${videos}</div>` : `<p class="empty-note">수업 영상은 준비 중입니다.</p>`}
+    ${deck}
+    ${videos ? `<div class="videos">${videos}</div>` : deck ? "" : `<p class="empty-note">수업 영상은 준비 중입니다.</p>`}
 
     ${artistSection(lesson)}
 
     ${figuresSection(lesson)}
 
+    ${sheetHtml(lesson)}
+
     ${details
       ? `<div class="details">${details}</div>`
       : `<p class="empty-note">이 ${LW()}의 활동 안내는 준비 중입니다.</p>`}
 
-    ${notesSection(unit, lesson)}
+    ${lesson.sheet ? "" : notesSection(unit, lesson)}
 
     ${strategySection(lesson)}
 
@@ -590,7 +597,9 @@ function renderLesson(unitId, no, pick = 0) {
       ${next ? `<a class="next" href="${lessonHref(next.unit, next.lesson)}"><span>다음 ${LW()}</span>${esc(next.lesson.title)}</a>` : ""}
     </nav>`;
 
-  document.getElementById("class-mode")?.addEventListener("click", () => openClassMode(lesson));
+  document.getElementById("class-mode")?.addEventListener("click", () => (lesson.slides?.count ? openSlideMode(lesson, 0) : openClassMode(lesson)));
+  bindSlideViewer(lesson);
+  bindSheet(lesson);
   document.title = `${lesson.no}${LW()} ${lesson.title} · ${course.title}`;
   if (track.length) watchBadgeVideos(unit, lesson);
   bindNotes(unit, lesson);
@@ -926,7 +935,7 @@ function wrapLines(x, text, maxW) {
   return out;
 }
 
-async function saveNotesImage(lesson, items) {
+async function saveNotesImage(lesson, items, opt = {}) {
   await document.fonts?.ready;
   const W = 1200, pad = 72, maxW = W - pad * 2;
   const disp = '"Gaegu", "Nanum Pen Script", cursive', body = '"Gothic A1", "Malgun Gothic", sans-serif';
@@ -948,8 +957,8 @@ async function saveNotesImage(lesson, items) {
   x.fillStyle = "#fffdf8"; x.fillRect(0, 0, W, H);
   x.strokeStyle = ink; x.lineWidth = 4; x.strokeRect(20, 20, W - 40, H - 40);
   let y = pad + 20;
-  x.fillStyle = sub; x.font = `500 26px ${body}`; x.fillText(`${course.title} · ${lesson.no}${LW()}`, pad, y);
-  y += 70; x.fillStyle = ink; x.font = `700 60px ${disp}`; x.fillText(`${lesson.title} — 내 생각`, pad, y);
+  x.fillStyle = sub; x.font = `500 26px ${body}`; x.fillText(`${course.title} · ${lesson.no}${LW()}${opt.who ? ` · ${opt.who}` : ""}`, pad, y);
+  y += 70; x.fillStyle = ink; x.font = `700 60px ${disp}`; x.fillText(opt.title || `${lesson.title} — 내 생각`, pad, y);
   y += 30; x.fillStyle = accent; x.fillRect(pad, y, 120, 5); y += 60;
   plan.forEach(({ ql, al, empty }) => {
     x.fillStyle = ink; x.font = `700 30px ${body}`;
@@ -964,7 +973,7 @@ async function saveNotesImage(lesson, items) {
   x.fillStyle = sub; x.font = `400 24px ${body}`;
   const d = new Date(); x.fillText(`${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 · ${siteTitle}`, pad, H - pad + 10);
   const a = document.createElement("a");
-  a.download = `${course.title}_${lesson.no}${LW()}_내 생각.png`;
+  a.download = `${course.title}_${lesson.no}${LW()}_${opt.file || "내 생각"}.png`;
   a.href = c.toDataURL("image/png");
   document.body.appendChild(a); a.click(); a.remove();
 }
@@ -1421,3 +1430,365 @@ function fail(e) {
 }
 
 init();
+
+/* ==========================================================================
+   성장 MAP: PPT 슬라이드 보기 + 웹 활동지 + PPT 수업 모드
+   lesson.slides: { dir, count, titles[], notes[] }  (dir/1.jpg … PPT를 그림으로 바꾼 것)
+   lesson.sheet:  { title, parts: [{ title, note, stage, who, slides[], items[] }] }
+   활동지 칸 종류: text · fill({} 빈칸) · choice(multi, other) · table(head, rows; 칸: 글자 | {in:"text"|"check"|"pick"}) ·
+                  scale(점검표) · cards(하나 고르기) · sort(카드 나누기) · tier(보충·기본·심화 골라 하기) · info
+   학생이 쓴 내용은 이 기기 브라우저에만 저장. 그림으로 저장해 모둠학습창·과제 게시판에 올림.
+   ========================================================================== */
+const SHEET_KEY = "snja-sheet-v1";
+const ME_KEY = "snja-me-v1";
+const readJSON = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch { return {}; } };
+const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
+const slideSrc = (lesson, k) => `${lesson.slides.dir}/${k}.jpg`;
+
+/* ---------- PPT 슬라이드 보기 (차시 화면) ---------- */
+function slideViewer(lesson) {
+  const s = lesson.slides;
+  if (!s?.count) return "";
+  const thumbs = Array.from({ length: s.count }, (_, i) => `
+    <li><button type="button" data-go="${i}" aria-label="${i + 1}번 슬라이드${s.titles?.[i] ? `: ${esc(s.titles[i])}` : ""}">
+      <img src="${esc(slideSrc(lesson, i + 1))}" alt="" loading="lazy" width="160" height="90"><span>${i + 1}</span></button></li>`).join("");
+  return `
+    <section class="deck" aria-label="수업 PPT">
+      <div class="deck-stage">
+        <img class="deck-img" src="${esc(slideSrc(lesson, 1))}" alt="${esc(s.titles?.[0] || "1번 슬라이드")}" width="1280" height="720">
+        <button type="button" class="deck-nav prev" data-move="-1" aria-label="이전 슬라이드">${icon.left}</button>
+        <button type="button" class="deck-nav next" data-move="1" aria-label="다음 슬라이드">${icon.right}</button>
+      </div>
+      <div class="deck-bar">
+        <span class="deck-count" aria-live="polite">1 / ${s.count}</span>
+        <span class="deck-title"></span>
+        ${isStudent ? "" : `<button type="button" class="btn-ghost deck-from">${icon.screen}이 장부터 수업 모드</button>`}
+      </div>
+      <ol class="deck-thumbs">${thumbs}</ol>
+      ${isStudent ? "" : `<div class="deck-notes"><b>발표자 메모</b><p></p></div>`}
+    </section>`;
+}
+
+function bindSlideViewer(lesson) {
+  const root = document.querySelector(".deck");
+  if (!root) return;
+  const s = lesson.slides;
+  let cur = 0;
+  const img = root.querySelector(".deck-img");
+  const show = (i) => {
+    cur = Math.max(0, Math.min(s.count - 1, i));
+    img.src = slideSrc(lesson, cur + 1);
+    img.alt = s.titles?.[cur] || `${cur + 1}번 슬라이드`;
+    root.querySelector(".deck-count").textContent = `${cur + 1} / ${s.count}`;
+    root.querySelector(".deck-title").textContent = s.titles?.[cur] ?? "";
+    const n = root.querySelector(".deck-notes p");
+    if (n) { n.textContent = s.notes?.[cur] || "메모 없음"; }
+    root.querySelectorAll(".deck-thumbs button").forEach((b, k) => b.setAttribute("aria-current", String(k === cur)));
+    const on = root.querySelector(`.deck-thumbs button[data-go="${cur}"]`);
+    const strip = root.querySelector(".deck-thumbs");
+    if (on && strip) strip.scrollLeft = on.parentElement.offsetLeft - strip.clientWidth / 2 + on.clientWidth / 2;
+    root.querySelector(".prev").disabled = cur === 0;
+    root.querySelector(".next").disabled = cur === s.count - 1;
+    // 이 슬라이드에서 쓰는 활동지 칸을 표시
+    document.querySelectorAll(".sheet-part").forEach((p) => p.classList.toggle("is-now", (JSON.parse(p.dataset.slides || "[]")).includes(cur + 1)));
+  };
+  root.addEventListener("click", (e) => {
+    const m = e.target.closest("[data-move]"); if (m) return show(cur + Number(m.dataset.move));
+    const g = e.target.closest("[data-go]"); if (g) return show(Number(g.dataset.go));
+    if (e.target.closest(".deck-from")) openSlideMode(lesson, cur);
+  });
+  root.querySelector(".deck-stage").addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") show(cur + 1);
+    if (e.key === "ArrowLeft") show(cur - 1);
+  });
+  root.querySelector(".deck-stage").tabIndex = 0;
+  // 손가락으로 밀어 넘기기
+  let x0 = null;
+  root.querySelector(".deck-stage").addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  root.querySelector(".deck-stage").addEventListener("touchend", (e) => {
+    if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+  });
+  show(0);
+}
+
+/* ---------- 웹 활동지 ---------- */
+function sheetState(lesson) { return readJSON(SHEET_KEY)[`${cid}/${lesson.no}`] ?? {}; }
+
+function sheetHtml(lesson, opts = {}) {
+  const sh = lesson.sheet;
+  if (!sh?.parts?.length) return "";
+  const st = sheetState(lesson);
+  const me = readJSON(ME_KEY);
+  const v = (id) => st[id];
+  const txt = (id, ph = "", lines = 1) => lines > 1
+    ? `<textarea data-id="${id}" rows="${lines}" placeholder="${esc(ph || "써 보세요.")}">${esc(v(id) ?? "")}</textarea>`
+    : `<input type="text" data-id="${id}" value="${esc(v(id) ?? "")}" placeholder="${esc(ph)}">`;
+  const item = (it, id) => {
+    switch (it.type) {
+      case "info": return `<p class="sh-info">${esc(it.text)}</p>`;
+      case "text": return `<label class="sh-field"><span class="sh-label">${esc(it.label)}</span>${txt(id, it.ph, it.lines)}</label>`;
+      case "fill": {
+        let k = 0;
+        const html = esc(it.text).replace(/\{\}/g, () => `<input type="text" class="sh-blank" data-id="${id}.${k}" value="${esc(v(`${id}.${k++}`) ?? "")}" aria-label="빈칸">`);
+        return `<p class="sh-fill">${html}</p>`;
+      }
+      case "choice": {
+        const sel = v(id) ?? (it.multi ? [] : null);
+        const opts2 = it.options.map((o, k) => {
+          const on = it.multi ? sel.includes?.(k) : sel === k;
+          return `<button type="button" class="sh-opt" data-choice="${id}" data-k="${k}"${it.multi ? ` data-multi="1"` : ""} aria-pressed="${on}">${esc(o)}</button>`;
+        }).join("");
+        return `<div class="sh-field"><span class="sh-label">${esc(it.label)}${it.multi ? ` <small>(모두 골라요)</small>` : ""}</span>
+          <div class="sh-opts">${opts2}</div>${it.other ? txt(`${id}.other`, "그 밖에") : ""}</div>`;
+      }
+      case "cards": {
+        const sel = v(id);
+        return `<div class="sh-field"><span class="sh-label">${esc(it.label)}</span><div class="sh-cards">${it.options.map((o, k) =>
+          `<button type="button" class="sh-card" data-choice="${id}" data-k="${k}" aria-pressed="${sel === k}"><b>${esc(o.name)}</b><small>${esc(o.desc || "")}</small></button>`).join("")}</div></div>`;
+      }
+      case "scale": {
+        return `<table class="sh-table sh-scale"><thead><tr><th>점검할 내용</th>${it.options.map((o) => `<th>${esc(o)}</th>`).join("")}</tr></thead><tbody>
+          ${it.rows.map((r, ri) => `<tr><th scope="row">${esc(r)}</th>${it.options.map((o, k) =>
+            `<td><button type="button" class="sh-dot" data-choice="${id}.${ri}" data-k="${k}" aria-pressed="${v(`${id}.${ri}`) === k}" aria-label="${esc(o)}"></button></td>`).join("")}</tr>`).join("")}
+          </tbody></table>`;
+      }
+      case "table": {
+        const cell = (c, ri, ci) => {
+          const cidx = `${id}.${ri}.${ci}`;
+          if (typeof c === "string") return ri === 0 && it.rows[0][0] === "예" ? `<td class="sh-ex">${esc(c)}</td>` : `<th scope="row">${esc(c)}</th>`;
+          if (c.in === "check") return `<td class="sh-c"><input type="checkbox" data-id="${cidx}"${v(cidx) ? " checked" : ""} aria-label="${esc(it.head[ci])}"></td>`;
+          if (c.in === "pick") return `<td><select data-id="${cidx}" aria-label="${esc(it.head[ci])}"><option value="">고르기</option>${c.options.map((o) => `<option${v(cidx) === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></td>`;
+          return `<td><input type="text" data-id="${cidx}" value="${esc(v(cidx) ?? "")}" placeholder="${esc(c.ph || "")}" aria-label="${esc(it.head[ci])}"></td>`;
+        };
+        return `${it.note ? `<p class="sh-note">${esc(it.note)}</p>` : ""}<div class="sh-scroll"><table class="sh-table"><thead><tr>${it.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
+          <tbody>${it.rows.map((r, ri) => `<tr>${r.map((c, ci) => cell(c, ri, ci)).join("")}</tr>`).join("")}</tbody></table></div>`;
+      }
+      case "sort": {
+        return `<div class="sh-field"><span class="sh-label">${esc(it.label)}</span><ul class="sh-sort">${it.cards.map((c, k) => {
+          const b = v(`${id}.${k}`);
+          return `<li><div><b>${esc(c.name)}</b><small>${esc(c.desc || "")}</small></div><div class="sh-bins">${it.bins.map((bn, bi) =>
+            `<button type="button" class="sh-bin bin-${bi}" data-choice="${id}.${k}" data-k="${bi}" aria-pressed="${b === bi}">${esc(bn)}</button>`).join("")}</div></li>`;
+        }).join("")}</ul></div>`;
+      }
+      case "tier": {
+        const sel = v(id);
+        return `<div class="sh-field sh-tier"><span class="sh-label">${esc(it.label)}</span>
+          <div class="sh-tabs">${it.tiers.map((t, k) => `<button type="button" class="sh-tab tab-${k}" data-choice="${id}" data-k="${k}" data-tier="1" aria-pressed="${sel === k}">${esc(t.name)}</button>`).join("")}</div>
+          ${it.tiers.map((t, k) => `<div class="sh-tier-body" data-tier-of="${id}" data-k="${k}"${sel === k ? "" : " hidden"}>
+            ${t.desc ? `<p class="sh-note">${esc(t.desc)}</p>` : ""}${t.items.map((x, j) => item(x, `${id}.t${k}.${j}`)).join("")}</div>`).join("")}
+        </div>`;
+      }
+      default: return "";
+    }
+  };
+  const parts = sh.parts.map((p, pi) => `
+    <section class="sheet-part" data-slides="${esc(JSON.stringify(p.slides ?? []))}" id="sheet-p${pi}">
+      <header><h3>${esc(p.title)}</h3>
+        ${p.stage ? `<span class="stage-chip" data-stage="${esc(p.stage[0])}">${esc(p.stage)}</span>` : ""}
+        ${p.who ? `<span class="sh-who">${esc(p.who)} 활동</span>` : ""}
+        ${p.slides?.length ? `<span class="sh-at">PPT ${p.slides.join("·")}번</span>` : ""}
+      </header>
+      ${p.note ? `<p class="sh-note">${esc(p.note)}</p>` : ""}
+      ${p.items.map((it, ii) => item(it, `p${pi}.${ii}`)).join("")}
+    </section>`).join("");
+  return `
+    <section class="sheet${opts.big ? " is-big" : ""}" aria-label="${esc(sh.title || "활동지")}">
+      ${opts.big ? "" : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요." : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
+      <div class="sheet-me">
+        <label>6학년 <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="반"> 반</label>
+        <label><input type="text" data-me="group" value="${esc(me.group ?? "")}" inputmode="numeric" aria-label="모둠"> 모둠</label>
+        <label>이름 <input type="text" data-me="name" value="${esc(me.name ?? "")}" aria-label="이름" class="me-name"></label>
+      </div>
+      ${parts}
+      <div class="sheet-tools">
+        <button class="btn-primary" type="button" data-sheet-save>${icon.download}활동지 그림으로 저장</button>
+        <button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>
+        <span class="sheet-status" aria-live="polite"></span>
+      </div>
+      <p class="notes-help">그림으로 저장해 모둠학습창이나 과제 게시판에 올려요.</p>
+    </section>`;
+}
+
+function bindSheet(lesson, root = document) {
+  const box = root.querySelector(".sheet");
+  if (!box) return;
+  const key = `${cid}/${lesson.no}`;
+  const status = box.querySelector(".sheet-status");
+  const save = (fn) => {
+    const all = readJSON(SHEET_KEY); all[key] = all[key] ?? {}; fn(all[key]);
+    status.textContent = writeJSON(SHEET_KEY, all) ? "저장했어요" : "이 기기에 저장할 수 없어요. 그림으로 저장해 두세요.";
+    clearTimeout(save.t); save.t = setTimeout(() => { status.textContent = ""; }, 1800);
+  };
+  box.addEventListener("input", (e) => {
+    const t = e.target;
+    if (t.dataset.me) { const me = readJSON(ME_KEY); me[t.dataset.me] = t.value; writeJSON(ME_KEY, me); return; }
+    if (t.dataset.id) save((s) => { s[t.dataset.id] = t.type === "checkbox" ? t.checked : t.value; });
+  });
+  box.addEventListener("change", (e) => { const t = e.target; if (t.tagName === "SELECT" && t.dataset.id) save((s) => { s[t.dataset.id] = t.value; }); });
+  box.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-choice]");
+    if (b) {
+      const id = b.dataset.choice, k = Number(b.dataset.k);
+      let val;
+      save((s) => {
+        if (b.dataset.multi) { const a = new Set(s[id] ?? []); a.has(k) ? a.delete(k) : a.add(k); s[id] = [...a].sort(); val = s[id]; }
+        else { s[id] = s[id] === k && !b.dataset.tier ? null : k; val = s[id]; }
+      });
+      box.querySelectorAll(`[data-choice="${CSS.escape(id)}"]`).forEach((x) => {
+        const kk = Number(x.dataset.k);
+        x.setAttribute("aria-pressed", String(Array.isArray(val) ? val.includes(kk) : val === kk));
+      });
+      if (b.dataset.tier) box.querySelectorAll(`[data-tier-of="${CSS.escape(id)}"]`).forEach((x) => { x.hidden = Number(x.dataset.k) !== val; });
+      return;
+    }
+    if (e.target.closest("[data-sheet-save]")) return saveSheetImage(lesson);
+    if (e.target.closest("[data-sheet-clear]")) {
+      if (!confirm("이 차시 활동지에 쓴 내용을 모두 지울까요?")) return;
+      const all = readJSON(SHEET_KEY); delete all[key]; writeJSON(SHEET_KEY, all);
+      const fresh = document.createElement("div"); fresh.innerHTML = sheetHtml(lesson, { big: box.classList.contains("is-big") });
+      box.replaceWith(fresh.firstElementChild); bindSheet(lesson, root);
+    }
+  });
+}
+
+// 활동지에 쓴 내용을 "질문 — 답" 목록으로 바꿈 (그림 저장용)
+function sheetAnswers(lesson) {
+  const st = sheetState(lesson);
+  const out = [];
+  const ans = (x) => (x === undefined || x === null || x === "" ? "" : String(x).trim());
+  const walk = (it, id, pre) => {
+    const label = pre ? `${pre} · ` : "";
+    switch (it.type) {
+      case "text": out.push({ q: label + it.label, a: ans(st[id]) }); break;
+      case "fill": { let k = 0; out.push({ q: label + "빈칸 채우기", a: it.text.replace(/\{\}/g, () => `[${ans(st[`${id}.${k++}`]) || "    "}]`) }); break; }
+      case "choice": {
+        const s = st[id]; let a = it.multi ? (s ?? []).map((k) => it.options[k]).join(", ") : (s ?? null) !== null ? it.options[s] : "";
+        if (it.other && ans(st[`${id}.other`])) a = [a, `그 밖에: ${ans(st[`${id}.other`])}`].filter(Boolean).join(", ");
+        out.push({ q: label + it.label, a }); break;
+      }
+      case "cards": out.push({ q: label + it.label, a: st[id] != null ? it.options[st[id]]?.name ?? "" : "" }); break;
+      case "scale": it.rows.forEach((r, ri) => out.push({ q: label + r, a: st[`${id}.${ri}`] != null ? it.options[st[`${id}.${ri}`]] : "" })); break;
+      case "sort": it.bins.forEach((bn, bi) => out.push({ q: label + bn, a: it.cards.filter((c, k) => st[`${id}.${k}`] === bi).map((c) => c.name).join(", ") })); break;
+      case "table": {
+        const lines = it.rows.map((r, ri) => {
+          if (r[0] === "예") return "";
+          const cells = r.map((c, ci) => (typeof c === "string" ? null : (c.in === "check" ? (st[`${id}.${ri}.${ci}`] ? `${it.head[ci]} ✔` : "") : (ans(st[`${id}.${ri}.${ci}`]) ? `${it.head[ci]}: ${ans(st[`${id}.${ri}.${ci}`])}` : ""))));
+          const head = typeof r[0] === "string" ? r[0] : "";
+          const filled = cells.filter(Boolean);
+          return filled.length ? `${head ? `${head} — ` : ""}${filled.join(" / ")}` : "";
+        }).filter(Boolean);
+        out.push({ q: label + (it.head.join(" · ")), a: lines.join("\n") }); break;
+      }
+      case "tier": {
+        const k = st[id];
+        if (k == null) { out.push({ q: label + it.label, a: "" }); break; }
+        const t = it.tiers[k];
+        t.items.forEach((x, j) => walk(x, `${id}.t${k}.${j}`, `${t.name}`));
+        break;
+      }
+      default: break;
+    }
+  };
+  lesson.sheet.parts.forEach((p, pi) => p.items.forEach((it, ii) => walk(it, `p${pi}.${ii}`, p.title)));
+  return out;
+}
+
+async function saveSheetImage(lesson) {
+  const me = readJSON(ME_KEY);
+  const who = [me.ban && `6학년 ${me.ban}반`, me.group && `${me.group}모둠`, me.name].filter(Boolean).join(" ");
+  await saveNotesImage(lesson, sheetAnswers(lesson), { title: `${lesson.title} — 활동지`, who, file: `활동지${me.name ? `_${me.name}` : ""}` });
+}
+
+/* ---------- PPT 수업 모드: 슬라이드를 넘기다 활동지를 띄움 ---------- */
+function openSlideMode(lesson, start = 0) {
+  const s = lesson.slides;
+  let cur = start, view = "slide", notes = false;
+  const overlay = document.createElement("div");
+  overlay.className = "slidemode";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", `${lesson.title} 수업 모드`);
+  overlay.innerHTML = `
+    <div class="sm-top">
+      <p><span>${lesson.no}${LW()}</span> ${esc(lesson.title)}</p>
+      <span class="sm-tools">
+        ${lesson.sheet ? `<button type="button" class="sm-btn sm-sheet">활동지</button>` : ""}
+        <button type="button" class="sm-btn sm-notes" aria-pressed="false">메모</button>
+        <button type="button" class="sm-btn sm-full">전체 화면</button>
+        <button class="cm-close" type="button" aria-label="수업 모드 닫기">${icon.close}</button>
+      </span>
+    </div>
+    <div class="sm-body">
+      <div class="sm-slide"><img alt="" width="1280" height="720"></div>
+      <div class="sm-sheet-view" hidden></div>
+    </div>
+    <div class="sm-note" hidden></div>
+    <div class="cm-nav">
+      <button type="button" data-move="-1" aria-label="이전 슬라이드">${icon.left}</button>
+      <span class="cm-count" aria-live="polite"></span>
+      <button type="button" data-move="1" aria-label="다음 슬라이드">${icon.right}</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.body.classList.add("no-scroll");
+  const img = overlay.querySelector(".sm-slide img");
+  const sheetView = overlay.querySelector(".sm-sheet-view");
+  const partsAt = (n) => (lesson.sheet?.parts ?? []).map((p, i) => ({ p, i })).filter(({ p }) => (p.slides ?? []).includes(n));
+  // 다음 슬라이드 그림을 미리 받아 둠
+  const pre = (k) => { if (k >= 1 && k <= s.count) { const im = new Image(); im.src = slideSrc(lesson, k); } };
+  const paint = () => {
+    img.src = slideSrc(lesson, cur + 1); img.alt = s.titles?.[cur] || `${cur + 1}번 슬라이드`;
+    pre(cur + 2);
+    overlay.querySelector(".cm-count").textContent = view === "slide" ? `${cur + 1} / ${s.count}` : "활동지";
+    const here = partsAt(cur + 1);
+    const btn = overlay.querySelector(".sm-sheet");
+    if (btn) {
+      btn.classList.toggle("is-hot", here.length > 0 && view === "slide");
+      btn.textContent = view === "sheet" ? "PPT로 돌아가기" : here.length ? `활동지: ${here[0].p.title}` : "활동지";
+    }
+    overlay.querySelector(".sm-slide").hidden = view !== "slide";
+    sheetView.hidden = view !== "sheet";
+    const nt = overlay.querySelector(".sm-note");
+    nt.hidden = !notes || view !== "slide"; nt.textContent = s.notes?.[cur] || "메모 없음";
+  };
+  const openSheet = () => {
+    view = "sheet";
+    sheetView.innerHTML = sheetHtml(lesson, { big: true });
+    bindSheet(lesson, sheetView);
+    paint();
+    const here = partsAt(cur + 1);
+    const target = here.length ? sheetView.querySelector(`#sheet-p${here[0].i}`) : null;
+    if (target) target.scrollIntoView({ block: "start" }); else sheetView.scrollTop = 0;
+  };
+  const move = (d) => {
+    if (view === "sheet") { view = "slide"; paint(); return; }
+    cur = Math.max(0, Math.min(s.count - 1, cur + d)); paint();
+  };
+  const close = () => {
+    document.removeEventListener("keydown", onKey);
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    overlay.remove(); document.body.classList.remove("no-scroll");
+    // 수업 모드에서 쓴 활동지 내용을 차시 화면에도 반영
+    const box = document.querySelector("#app .sheet");
+    if (box) { const f = document.createElement("div"); f.innerHTML = sheetHtml(lesson); box.replaceWith(f.firstElementChild); bindSheet(lesson); }
+  };
+  const onKey = (e) => {
+    if (e.target.closest?.("input, textarea, select")) { if (e.key === "Escape") e.target.blur(); return; }
+    if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); move(1); }
+    else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); move(-1); }
+    else if (e.key === "Escape") close();
+    else if (e.key === "w" || e.key === "W" || e.key === "ㅈ") { view === "sheet" ? (view = "slide", paint()) : openSheet(); }
+  };
+  document.addEventListener("keydown", onKey);
+  overlay.addEventListener("click", (e) => {
+    const m = e.target.closest("[data-move]"); if (m) return move(Number(m.dataset.move));
+    if (e.target.closest(".cm-close")) return close();
+    if (e.target.closest(".sm-sheet")) return view === "sheet" ? (view = "slide", paint()) : openSheet();
+    if (e.target.closest(".sm-notes")) { notes = !notes; e.target.closest(".sm-notes").setAttribute("aria-pressed", String(notes)); return paint(); }
+    if (e.target.closest(".sm-full")) { document.fullscreenElement ? document.exitFullscreen?.() : overlay.requestFullscreen?.().catch(() => {}); return; }
+    // 슬라이드 오른쪽/왼쪽을 누르면 넘김
+    if (e.target === img) { const r = img.getBoundingClientRect(); move(e.clientX > r.left + r.width / 3 ? 1 : -1); }
+  });
+  paint();
+  overlay.querySelector(".cm-close").focus();
+}

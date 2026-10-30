@@ -5,6 +5,15 @@
 - 선생님 자료실: https://biossam.github.io/snja_map/
 - 학생용 화면: https://biossam.github.io/snja_map/?view=student
 
+## 무엇이 다른가 (humanskill_art와 비교)
+
+| 화면 | 내용 |
+|---|---|
+| 차시 화면 | 영상 대신 **수업 PPT**가 가운데. 화살표·썸네일로 넘기고, 선생님 화면에는 발표자 메모가 보임 |
+| 활동지 | 학생이 화면에서 바로 입력하는 **웹 활동지**. 쓴 내용은 그 기기에 자동 저장되고, "활동지 그림으로 저장"으로 모둠학습창·과제 게시판에 올림 |
+| 수업 모드 | PPT를 넘기다가 **활동지** 버튼(활동지를 쓰는 슬라이드에서 주황색으로 깜빡임) 또는 W 키로 활동지를 크게 띄움. 메모, 전체 화면 지원 |
+| 선생님 자료 | 차시마다 **수업 PPT(.pptx)**와 **수업 활동지(.docx)** 내려받기 |
+
 ## 자료 추가
 
 모든 내용은 `data/course.json`에서 관리합니다.
@@ -13,7 +22,9 @@
 - 활동지: `files/차시번호/worksheet.hwpx`에 넣고 `teacher.worksheet`에 경로 기록
 - 수업 자료 그림: `assets/img/figures/`에 넣고 차시의 `figures`에 기록 (`level`: 기본·보충·심화)
 - 성장 MAP 전략·준비 메모: 차시의 `strategy`, `prep` (선생님 화면에만 보임)
-- 수업 PPT와 지도안은 사이트에 올리지 않았습니다.
+- 수업 PPT: `files/차시번호/ppt.pptx`, 슬라이드 그림: `assets/slides/차시번호/1.jpg …` (PPT를 고치면 그림도 다시 만들어 넣기)
+- 웹 활동지: 차시의 `sheet` (칸 종류는 `assets/js/app.js`의 "웹 활동지" 설명 참고)
+- 지도안은 사이트에 올리지 않았습니다.
 - 배지: `assets/img/badges/차시번호.png`에 넣고 차시의 `badge`에 경로 기록
 
 ## 구조
