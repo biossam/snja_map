@@ -1,6 +1,5 @@
-/* 휴먼스킬아트
-   색과 글꼴은 수업 영상 표지에서 가져왔습니다: 남색 글자, 파랑 강조 한 가지, 제목만 손글씨.
-   장식은 쓰지 않고 순서·여백·글자 크기로 구조를 만듭니다. */
+/* 성장 MAP (humanskill_art 사이트 틀)
+   남색 글자, 파랑 강조, 제목만 손글씨. 성장 MAP 단계(M 동기 · A 성찰 · P 맞춤 · 환류)만 작은 색 칩으로 구분합니다. */
 
 :root {
   --bg: #fafafa;
@@ -808,3 +807,56 @@ a.ri-head:focus-visible, .ri-btn:focus-visible { outline: 3px solid var(--accent
 .pdfv-pbox { flex: 1; min-height: 0; display: flex; }
 .pdfv-pbox iframe, .pdfv-pbox video { flex: 1; width: 100%; height: 100%; border: 0; background: #000; }
 .pdfv-player[hidden], .pdfv-vlist[hidden], .pdfv-vbtn[hidden] { display: none; }
+
+/* ---------- 성장 MAP 추가 ---------- */
+:root { --m: #f08a24; --a: #3a9bfa; --p: #2a9d8f; --f: #8a63d2; }
+.stage-chip {
+  display: inline-block; vertical-align: middle;
+  padding: 1px 9px; border-radius: 999px;
+  font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; line-height: 1.6; letter-spacing: 0;
+  color: #fff; background: var(--a); white-space: nowrap;
+}
+.stage-chip[data-stage="M"] { background: var(--m); }
+.stage-chip[data-stage="A"] { background: var(--a); }
+.stage-chip[data-stage="P"] { background: var(--p); }
+.stage-chip[data-stage="환"] { background: var(--f); }
+.lesson-kicker .stage-chip { margin-left: var(--s2); }
+.lesson-kicker .pages { margin-left: var(--s2); font-weight: 500; color: var(--muted); }
+.step-text .stage-chip { align-self: flex-start; margin-top: var(--s1); }
+
+.key-question {
+  margin: var(--s5) 0 var(--s4); padding: var(--s4) var(--s4) var(--s4) var(--s5);
+  border-radius: 14px; background: var(--surface); border: 1px solid var(--line);
+  border-left: 6px solid var(--m);
+  font-family: var(--font-display); font-size: 1.5rem; line-height: 1.3; font-weight: 700; color: var(--ink);
+}
+.key-question span { display: block; font-family: var(--font-body); font-size: 0.75rem; color: var(--muted); margin-bottom: var(--s1); }
+.points { margin: 0 0 var(--s4); }
+.points-title { margin: 0 0 var(--s2); font-size: 0.8125rem; font-weight: 700; color: var(--muted); }
+.points ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.points li { padding: 3px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 0.8125rem; }
+.points li small { display: none; }
+
+.figures { margin-top: var(--s7); }
+.figures h2, .strategy h2 { margin: 0 0 var(--s4); font-family: var(--font-display); font-weight: 700; font-size: 1.75rem; line-height: 1.2; }
+.figure-grid { display: grid; gap: var(--s5); }
+@media (min-width: 720px) { .figure-grid { grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); } }
+.figure { position: relative; margin: 0; padding: var(--s3); border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.figure img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.figure figcaption { margin-top: var(--s2); font-size: 0.9375rem; color: #3d3d66; }
+.figure figcaption small { display: block; font-size: 0.75rem; color: #74748c; }
+.figure-level { position: absolute; top: -10px; left: var(--s3); padding: 0 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; color: #fff; background: var(--p); }
+.figures .files { margin-top: var(--s4); }
+
+.strategy { margin-top: var(--s7); padding: var(--s5); border-radius: 14px; background: var(--surface); border: 1px dashed var(--line); }
+.strategy-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s4); }
+.strategy-list li { display: grid; grid-template-columns: 4.5rem 1fr; gap: var(--s3); align-items: start; }
+.strategy-list .stage-chip { justify-self: start; margin-top: 3px; }
+.strategy-tool { margin: 0; font-size: 0.875rem; color: var(--muted); }
+.strategy-effect { margin: var(--s1) 0 0; color: var(--ink-2); }
+.prep { margin-top: var(--s5); }
+.prep h3 { margin: 0 0 var(--s2); font-size: 1rem; }
+.prep ul { margin: 0; padding-left: 1.25em; color: var(--ink-2); }
+.prep li + li { margin-top: var(--s1); }
+.figures .files .file { min-width: 20rem; }
+.figures .files .format { white-space: nowrap; }

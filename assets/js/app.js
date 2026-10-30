@@ -348,6 +348,7 @@ function renderHome() {
               <span class="step-text">
                 <span class="step-title" title="${esc(lesson.title)}">${esc(lesson.title)}</span>
                 ${lesson.topic ? `<span class="step-topic">${esc(lesson.topic)}</span>` : ""}
+                ${lesson.stage ? `<span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}
                 <span class="step-status">${esc(lessonStatus(lesson))}</span>
               </span>
               ${thumbId ? `<img class="step-thumb" src="${thumbOf(vids[0])}" alt="" loading="lazy">` : ""}
@@ -368,6 +369,8 @@ function renderHome() {
         ${isStudent
           ? `${LW()}${LW() === "편" ? "을" : "를"} 골라 수업 영상을 다시 볼 수 있어요.`
           : (course.noWorksheet ? `${LW()}마다 수업 영상을 파트별로 보며 활동할 수 있습니다.` : `${LW()}마다 수업 영상을 보고 활동지를 무료로 받을 수 있습니다.`)}</p>
+      ${course.keyQuestion ? `<div class="key-question"><span>핵심 질문</span>${esc(course.keyQuestion)}</div>` : ""}
+      ${(course.points ?? []).length ? `<div class="points"><p class="points-title">모아 보는 칭찬포인트</p><ul>${course.points.map((x) => `<li title="${esc(x.desc || "")}"><b>${esc(x.name)}</b><small>${esc(x.desc || "")}</small></li>`).join("")}</ul></div>` : ""}
       ${isStudent ? "" : `<a class="text-link" href="${homeHref()}/qr">학생용 QR 코드 보기</a>`}
       ${isStudent ? "" : (course.teacherLinks ?? []).map((l) => safeUrl(l.url)
         ? `<a class="text-link teacher-link" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.title)}</a>` : "").join("")}
@@ -439,6 +442,41 @@ function artistSection(lesson) {
       ${a.work ? `<p class="artist-work"><span>대표 작업</span>${esc(a.work)}</p>` : ""}
       ${a.ask ? `<p class="artist-ask">${esc(a.ask)}</p>` : ""}
       ${links ? `<div class="artist-links">${links}</div>` : ""}
+    </section>`;
+}
+
+// 수업 자료 그림(그래프 등)과 바깥 자료 링크. 학생 화면에도 보임
+function figuresSection(lesson) {
+  const figs = (lesson.figures ?? []).filter((f) => safeUrl(f.src));
+  const links = (lesson.links ?? []).filter((l) => safeUrl(l.url));
+  if (!figs.length && !links.length) return "";
+  return `
+    <section class="figures">
+      <h2>수업 자료</h2>
+      ${figs.length ? `<div class="figure-grid">${figs.map((f) => `
+        <figure class="figure${f.level ? ` level-${esc(f.level)}` : ""}">
+          ${f.level ? `<span class="figure-level">${esc(f.level)}</span>` : ""}
+          <a href="${esc(safeUrl(f.src))}" target="_blank" rel="noopener"><img src="${esc(safeUrl(f.src))}" alt="${esc(f.alt || f.caption || "")}" loading="lazy"></a>
+          ${f.caption ? `<figcaption>${esc(f.caption)}${f.source ? `<small>${esc(f.source)}</small>` : ""}</figcaption>` : ""}
+        </figure>`).join("")}</div>` : ""}
+      ${links.length ? `<ul class="files">${links.map((l) => `<li><a class="file" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${icon.external}<span>${esc(l.title)}</span><span class="format">${esc(l.source || "외부 사이트")}</span></a></li>`).join("")}</ul>` : ""}
+    </section>`;
+}
+
+// 성장 MAP 전략(동기 M · 성찰 A · 맞춤 P)과 기대효과, 선생님 준비 메모. 선생님 화면에만 보임
+function strategySection(lesson) {
+  if (isStudent) return "";
+  const st = lesson.strategy ?? [];
+  const tips = lesson.prep ?? [];
+  if (!st.length && !tips.length) return "";
+  return `
+    <section class="strategy">
+      <h2>성장 MAP 전략</h2>
+      ${st.length ? `<ol class="strategy-list">${st.map((x) => `
+        <li><span class="stage-chip" data-stage="${esc((x.stage || "")[0] || "")}">${esc(x.stage || "")}</span>
+          <div><p class="strategy-tool">${(x.tools ?? []).map(esc).join("<br>")}</p>
+          <p class="strategy-effect">${esc(x.effect || "")}</p></div></li>`).join("")}</ol>` : ""}
+      ${tips.length ? `<div class="prep"><h3>준비와 진행 메모</h3><ul>${tips.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}
     </section>`;
 }
 
@@ -521,7 +559,7 @@ function renderLesson(unitId, no, pick = 0) {
       <div class="lesson-title${isStudent && lesson.badge && !isEarned(cid, unit, lesson) ? " not-earned" : ""}">
         ${badgeImg(lesson, "lesson-badge")}
         <div>
-          <p class="lesson-kicker">${lesson.no}${LW()}</p>
+          <p class="lesson-kicker">${lesson.no}${LW()}${lesson.stage ? ` <span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}${lesson.pages ? ` <span class="pages">${esc(lesson.pages)}</span>` : ""}</p>
           <h1>${esc(lesson.title)}</h1>
           ${lesson.topic ? `<p class="lesson-topic">${esc(lesson.topic)}</p>` : ""}
           ${badgeNote(unit, lesson)}
@@ -535,11 +573,15 @@ function renderLesson(unitId, no, pick = 0) {
 
     ${artistSection(lesson)}
 
+    ${figuresSection(lesson)}
+
     ${details
       ? `<div class="details">${details}</div>`
       : `<p class="empty-note">이 ${LW()}의 활동 안내는 준비 중입니다.</p>`}
 
     ${notesSection(unit, lesson)}
+
+    ${strategySection(lesson)}
 
     ${teacherSection(lesson)}
 
@@ -1327,7 +1369,9 @@ async function route() {
 
 function renderChrome() {
   const label = document.getElementById("view-label");
-  if (isStudent) { label.innerHTML = `<a id="badge-link" href="#/badges"></a>`; updateBadgeLink(); }
+  // 배지 그림이 있는 차시가 하나라도 있을 때만 "내 배지" 링크를 보여 줌
+  const hasBadges = (units ?? []).some((u) => (u.lessons ?? []).some((l) => l.badge));
+  if (isStudent) { label.innerHTML = hasBadges ? `<a id="badge-link" href="#/badges"></a>` : "학생용"; updateBadgeLink(); }
   else label.textContent = "선생님 자료실";
   const brand = document.getElementById("brand");
   brand.textContent = siteTitle;
@@ -1353,7 +1397,7 @@ function renderChrome() {
   document.getElementById("footer").innerHTML = `
     <p>${esc(course.title)}${course.author ? `, 개발 ${esc(course.author)}` : ""} · ${esc(siteTitle)}</p>
     ${(course.credits ?? []).length ? `<p>${course.credits.map(esc).join(" / ")}</p>` : ""}
-    ${lic ? `<p>이 교재의 글과 활동지는 <a href="${esc(lic.url)}" target="_blank" rel="noopener">${esc(lic.name)}</a> 조건으로 무료 공개합니다. 교육청 로고와 작가 작품의 권리는 각 권리자에게 있습니다.</p>` : ""}`;
+    ${lic ? `<p>이 교재의 글과 활동지는 <a href="${esc(lic.url)}" target="_blank" rel="noopener">${esc(lic.name)}</a> 조건으로 무료 공개합니다. ${esc(lic.footer ?? "교육청 로고와 작가 작품의 권리는 각 권리자에게 있습니다.")}</p>` : ""}`;
 }
 
 async function init() {

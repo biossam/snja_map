@@ -1,12 +1,13 @@
 {
   "site": {
     "title": "성장 MAP",
-    "default": "growthmap"
+    "default": "trade"
   },
   "courses": [
     {
-      "id": "growthmap",
-      "title": "성장 MAP",
+      "id": "trade",
+      "grade": 6,
+      "title": "국가 간 무역",
       "file": "data/course.json"
     }
   ]
