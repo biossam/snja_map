@@ -374,6 +374,7 @@ function renderHome() {
       ${course.keyQuestion ? `<div class="key-question"><span>핵심 질문</span>${esc(course.keyQuestion)}</div>` : ""}
       ${(course.points ?? []).length ? `<div class="points"><p class="points-title">모아 보는 칭찬포인트</p><ul>${course.points.map((x) => `<li title="${esc(x.desc || "")}">${x.img ? `<img src="${esc(x.img)}" alt="" width="60" height="72" loading="lazy">` : ""}<b>${esc(x.name)}</b><small>${esc(x.desc || "")}</small></li>`).join("")}</ul></div>` : ""}
       ${isStudent ? "" : `<a class="text-link" href="${homeHref()}/qr">학생용 QR 코드 보기</a>`}
+      ${isStudent || !course.slideCourse ? "" : `<a class="text-link" href="${homeHref()}/live/1">실시간 현황 보기</a>`}
       ${isStudent ? "" : (course.teacherLinks ?? []).map((l) => safeUrl(l.url)
         ? `<a class="text-link teacher-link" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.title)}</a>` : "").join("")}
     </section></aside>
@@ -570,7 +571,7 @@ function renderLesson(unitId, no, pick = 0) {
         </div>
       </div>
       ${lesson.goal ? `<p class="goal"><span>학습 목표</span>${esc(lesson.goal)}</p>` : ""}
-      ${canClassMode ? `<button class="btn-primary" id="class-mode" type="button">${icon.screen}수업 모드</button>` : ""}
+      ${canClassMode ? `<span class="head-actions"><button class="btn-primary" id="class-mode" type="button">${icon.screen}수업 모드</button>${lesson.sheet && !isStudent ? `<a class="btn-ghost" href="${homeHref()}/live/${lesson.no}" target="_blank" rel="noopener">실시간 현황</a>` : ""}</span>` : ""}
     </header>
 
     ${deck}
@@ -1343,6 +1344,14 @@ function renderQR() {
 //   예전 주소(#/, #/lesson/…, #/qr)는 site.json의 default 교재(휴먼스킬아트)로 엽니다.
 async function route() {
   let hash = location.hash || "#/";
+  // 교실 링크 교사 화면에서 "실시간 현황"으로 열면 주소 끝에 &room=…&key=… 가 붙어 옴 → 기억하고 주소에서 지움
+  const hk = hash.match(/^(#[^&]*)&(.*)$/);
+  if (hk) {
+    const q = new URLSearchParams(hk[2]);
+    if (q.get("room") && q.get("key") && !isStudent) writeJSON(LIVE_T_KEY, { room: q.get("room").toUpperCase(), code: q.get("key") });
+    hash = hk[1];
+    history.replaceState(null, "", `${location.pathname}${location.search}${hash}`);
+  }
   const certM = hash.match(/^#\/cert\/([^/]+)$/);
   if ((hash === "#/badges" || certM) && isStudent) {
     if (!cid) { const d = courses.find((x) => x.id === defaultId); /* 머리말을 그리려면 교재 하나는 필요 */
@@ -1373,6 +1382,8 @@ async function route() {
   const m = hash.match(/^#\/lesson\/([^/]+)\/(\d+)(?:\/v(\d+))?$/);
   if (m) return renderLesson(decodeURIComponent(m[1]), m[2], m[3] ? Number(m[3]) : 0);
   if (hash === "#/qr" && !isStudent) return renderQR();
+  const lv = hash.match(/^#\/live(?:\/(\d+))?$/);
+  if (lv && !isStudent) return renderLive(lv[1] ?? "1");
   renderHome();
 }
 
@@ -1415,6 +1426,10 @@ async function init() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     siteTitle = data.site?.title ?? "";
+    LIVE.url = String(data.site?.live?.url ?? "").trim();
+    // QR·링크로 들어온 수업 코드는 기기에 기억해 둠
+    const roomQ = new URLSearchParams(location.search).get("room");
+    if (roomQ && isStudent) { const me = readJSON(ME_KEY); me.room = roomQ.replace(/[^0-9A-Za-z]/g, "").slice(0, 6).toUpperCase(); writeJSON(ME_KEY, me); }
     // 학생용 화면에서는 선생님 전용 자료(teacherOnly)를 아예 빼고 시작
     courses = (data.courses ?? []).filter((x) => !(isStudent && x.teacherOnly));
     if (!courses.length) throw new Error("교재 목록이 비어 있음");
@@ -1440,6 +1455,18 @@ init();
    학생이 쓴 내용은 이 기기 브라우저에만 저장. 그림으로 저장해 모둠학습창·과제 게시판에 올림.
    ========================================================================== */
 const SHEET_KEY = "snja-sheet-v1";
+// 실시간 수업 서버 (site.json의 site.live.url). 비어 있으면 실시간 기능 없이 기기에만 저장
+const LIVE = { url: "", config: {}, connected: false };
+const LIVE_T_KEY = "snja-live-teacher-v1";
+async function liveCall(body) {
+  if (!LIVE.url) throw new Error("실시간 수업 서버가 아직 연결되지 않았어요");
+  // text/plain으로 보내 브라우저 사전 확인(CORS preflight) 없이 바로 보냄
+  const res = await fetch(LIVE.url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || "서버 오류");
+  if (data.config) LIVE.config = data.config;
+  return data;
+}
 const ME_KEY = "snja-me-v1";
 const readJSON = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch { return {}; } };
 const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
@@ -1520,6 +1547,39 @@ function sheetHtml(lesson, opts = {}) {
   if (!sh?.parts?.length) return "";
   const st = sheetState(lesson);
   const me = readJSON(ME_KEY);
+  const parts = sh.parts.map((p, pi) => partHtml(lesson, p, pi, st, opts)).join("");
+  const live = Boolean(LIVE.url) && isStudent;
+  return `
+    <section class="sheet${opts.big ? " is-big" : ""}${opts.readonly ? " is-readonly" : ""}" aria-label="${esc(sh.title || "활동지")}">
+      ${opts.big || opts.readonly ? "" : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? (live ? "여기에 바로 써요. 쓴 내용은 이 기기에 저장되고, 교실 링크 참여 코드를 넣으면 선생님 화면에도 바로 보여요." : "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.") : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
+      ${opts.readonly ? "" : `<div class="sheet-me">
+        <label>6학년 <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="반"> 반</label>
+        <label><input type="text" data-me="no" value="${esc(me.no ?? "")}" inputmode="numeric" aria-label="번호"> 번</label>
+        <label><input type="text" data-me="group" value="${esc(me.group ?? "")}" inputmode="numeric" aria-label="모둠"> 모둠</label>
+        <label>이름 <input type="text" data-me="name" value="${esc(me.name ?? "")}" aria-label="이름" class="me-name"></label>
+        ${live ? `<label class="me-room">참여 코드 <input type="text" data-me="room" value="${esc(me.room ?? "")}" maxlength="6" autocapitalize="characters" aria-label="교실 링크 참여 코드" class="me-roomin"></label>
+          <span class="live-chip" data-live-chip>연결 안 됨</span>` : ""}
+      </div>
+      ${live ? `<p class="sheet-privacy">이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.</p>` : ""}`}
+      ${parts}
+      ${opts.readonly ? "" : `<div class="sheet-tools">
+        ${live ? `<button class="btn-primary" type="button" data-sheet-submit>${icon.right}선생님께 제출</button>` : ""}
+        <button class="${live ? "btn-ghost" : "btn-primary"}" type="button" data-sheet-save>${icon.download}활동지 그림으로 저장</button>
+        <button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>
+        <span class="sheet-status" aria-live="polite"></span>
+      </div>
+      <p class="notes-help">${live ? "제출하면 선생님 화면에 \"제출\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요." : "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요."}</p>`}
+    </section>`;
+}
+
+// 이 차시의 이 칸이 모둠이 함께 쓰는 칸인지 (선생님 설정이 있으면 그것, 없으면 교재 기본값)
+function isGroupPart(lesson, pi) {
+  const g = LIVE.config?.groupParts?.[String(lesson.no)];
+  if (Array.isArray(g)) return g.includes(pi);
+  return lesson.sheet.parts[pi]?.who === "모둠";
+}
+
+function partHtml(lesson, p, pi, st, opts = {}) {
   const v = (id) => st[id];
   const txt = (id, ph = "", lines = 1) => lines > 1
     ? `<textarea data-id="${id}" rows="${lines}" placeholder="${esc(ph || "써 보세요.")}">${esc(v(id) ?? "")}</textarea>`
@@ -1582,31 +1642,17 @@ function sheetHtml(lesson, opts = {}) {
       default: return "";
     }
   };
-  const parts = sh.parts.map((p, pi) => `
-    <section class="sheet-part" data-slides="${esc(JSON.stringify(p.slides ?? []))}" id="sheet-p${pi}">
+  const group = isGroupPart(lesson, pi);
+  return `
+    <section class="sheet-part${group ? " is-group" : ""}" data-slides="${esc(JSON.stringify(p.slides ?? []))}" data-pi="${pi}" id="${opts.idPrefix || ""}sheet-p${pi}">
       <header><h3>${esc(p.title)}</h3>
         ${p.stage ? `<span class="stage-chip" data-stage="${esc(p.stage[0])}">${esc(p.stage)}</span>` : ""}
-        ${p.who ? `<span class="sh-who">${esc(p.who)} 활동</span>` : ""}
+        ${group ? `<span class="sh-who is-group">모둠이 함께 써요</span>` : ""}
         ${p.slides?.length ? `<span class="sh-at">PPT ${p.slides.join("·")}번</span>` : ""}
       </header>
       ${p.note ? `<p class="sh-note">${esc(p.note)}</p>` : ""}
+      ${group && LIVE.url && isStudent ? `<p class="sh-note sh-group-note">같은 모둠 친구가 쓴 내용이 몇 초 뒤 여기에도 나타나요.</p>` : ""}
       ${p.items.map((it, ii) => item(it, `p${pi}.${ii}`)).join("")}
-    </section>`).join("");
-  return `
-    <section class="sheet${opts.big ? " is-big" : ""}" aria-label="${esc(sh.title || "활동지")}">
-      ${opts.big ? "" : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요." : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
-      <div class="sheet-me">
-        <label>6학년 <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="반"> 반</label>
-        <label><input type="text" data-me="group" value="${esc(me.group ?? "")}" inputmode="numeric" aria-label="모둠"> 모둠</label>
-        <label>이름 <input type="text" data-me="name" value="${esc(me.name ?? "")}" aria-label="이름" class="me-name"></label>
-      </div>
-      ${parts}
-      <div class="sheet-tools">
-        <button class="btn-primary" type="button" data-sheet-save>${icon.download}활동지 그림으로 저장</button>
-        <button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>
-        <span class="sheet-status" aria-live="polite"></span>
-      </div>
-      <p class="notes-help">그림으로 저장해 모둠학습창이나 과제 게시판에 올려요.</p>
     </section>`;
 }
 
@@ -1615,17 +1661,25 @@ function bindSheet(lesson, root = document) {
   if (!box) return;
   const key = `${cid}/${lesson.no}`;
   const status = box.querySelector(".sheet-status");
-  const save = (fn) => {
+  const say = (t) => { if (!status) return; status.textContent = t; clearTimeout(say.t); say.t = setTimeout(() => { status.textContent = ""; }, 2200); };
+  const partOf = (id) => Number(String(id).match(/^p(\d+)\./)?.[1] ?? -1);
+  const save = (fn, changedId) => {
     const all = readJSON(SHEET_KEY); all[key] = all[key] ?? {}; fn(all[key]);
-    status.textContent = writeJSON(SHEET_KEY, all) ? "저장했어요" : "이 기기에 저장할 수 없어요. 그림으로 저장해 두세요.";
-    clearTimeout(save.t); save.t = setTimeout(() => { status.textContent = ""; }, 1800);
+    // 모둠 칸이 바뀌면 바뀐 시각을 남겨 같은 모둠 친구 화면과 맞춤
+    if (changedId && isGroupPart(lesson, partOf(changedId))) { all[key]._gt = all[key]._gt ?? {}; all[key]._gt[changedId] = Date.now(); }
+    say(writeJSON(SHEET_KEY, all) ? "저장했어요" : "이 기기에 저장할 수 없어요. 그림으로 저장해 두세요.");
+    liveSoon(lesson);
   };
   box.addEventListener("input", (e) => {
     const t = e.target;
-    if (t.dataset.me) { const me = readJSON(ME_KEY); me[t.dataset.me] = t.value; writeJSON(ME_KEY, me); return; }
-    if (t.dataset.id) save((s) => { s[t.dataset.id] = t.type === "checkbox" ? t.checked : t.value; });
+    if (t.dataset.me) {
+      const me = readJSON(ME_KEY); me[t.dataset.me] = t.dataset.me === "room" ? t.value.trim().toUpperCase() : t.value.trim(); writeJSON(ME_KEY, me);
+      if (["ban", "no", "group", "room"].includes(t.dataset.me)) liveSoon(lesson, 900);
+      return;
+    }
+    if (t.dataset.id) save((s) => { s[t.dataset.id] = t.type === "checkbox" ? t.checked : t.value; }, t.dataset.id);
   });
-  box.addEventListener("change", (e) => { const t = e.target; if (t.tagName === "SELECT" && t.dataset.id) save((s) => { s[t.dataset.id] = t.value; }); });
+  box.addEventListener("change", (e) => { const t = e.target; if (t.tagName === "SELECT" && t.dataset.id) save((s) => { s[t.dataset.id] = t.value; }, t.dataset.id); });
   box.addEventListener("click", (e) => {
     const b = e.target.closest("[data-choice]");
     if (b) {
@@ -1634,7 +1688,7 @@ function bindSheet(lesson, root = document) {
       save((s) => {
         if (b.dataset.multi) { const a = new Set(s[id] ?? []); a.has(k) ? a.delete(k) : a.add(k); s[id] = [...a].sort(); val = s[id]; }
         else { s[id] = s[id] === k && !b.dataset.tier ? null : k; val = s[id]; }
-      });
+      }, id);
       box.querySelectorAll(`[data-choice="${CSS.escape(id)}"]`).forEach((x) => {
         const kk = Number(x.dataset.k);
         x.setAttribute("aria-pressed", String(Array.isArray(val) ? val.includes(kk) : val === kk));
@@ -1643,6 +1697,7 @@ function bindSheet(lesson, root = document) {
       return;
     }
     if (e.target.closest("[data-sheet-save]")) return saveSheetImage(lesson);
+    if (e.target.closest("[data-sheet-submit]")) return liveSync(lesson, true);
     if (e.target.closest("[data-sheet-clear]")) {
       if (!confirm("이 차시 활동지에 쓴 내용을 모두 지울까요?")) return;
       const all = readJSON(SHEET_KEY); delete all[key]; writeJSON(SHEET_KEY, all);
@@ -1650,11 +1705,118 @@ function bindSheet(lesson, root = document) {
       box.replaceWith(fresh.firstElementChild); bindSheet(lesson, root);
     }
   });
+  // 실시간 수업: 처음 한 번 보내고, 모둠 칸이 있으면 몇 초마다 같은 모둠 내용을 받아 옴
+  if (LIVE.url && isStudent) {
+    liveSync(lesson);
+    clearInterval(bindSheet.poll);
+    bindSheet.poll = setInterval(() => {
+      if (!box.isConnected) { clearInterval(bindSheet.poll); return; }
+      livePullGroup(lesson);
+    }, 4000);
+  }
+}
+
+/* ---------- 실시간 수업 (학생) ---------- */
+function liveSoon(lesson, wait = 1500) {
+  if (!LIVE.url || !isStudent) return;
+  clearTimeout(liveSoon.t);
+  liveSoon.t = setTimeout(() => liveSync(lesson), wait);
+}
+
+function liveChip(text, ok) {
+  document.querySelectorAll("[data-live-chip]").forEach((c) => { c.textContent = text; c.classList.toggle("is-on", Boolean(ok)); });
+}
+
+function liveWho() {
+  const me = readJSON(ME_KEY);
+  const room = String(me.room ?? "").trim(), ban = String(me.ban ?? "").trim(), no = String(me.no ?? "").trim();
+  return { me, room, ban, no, group: String(me.group ?? "").trim(), ready: Boolean(room && ban && no) };
+}
+
+// 내 활동지 전체와 모둠 칸 변경분을 서버에 보냄. submit이면 "제출"로 남김
+async function liveSync(lesson, submit = false) {
+  if (!LIVE.url || !isStudent) return;
+  const w = liveWho();
+  if (!w.ready) {
+    liveChip(w.room ? "반·번호를 써요" : "참여 코드를 써요", false);
+    if (submit) alert("선생님께 보내려면 반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.");
+    return;
+  }
+  const st = sheetState(lesson);
+  const fields = {}; const gfields = {};
+  Object.keys(st).forEach((id) => { if (id !== "_gt") fields[id] = st[id]; });
+  Object.entries(st._gt ?? {}).forEach(([id, t]) => { if (isGroupPart(lesson, Number(id.match(/^p(\d+)\./)?.[1] ?? -1))) gfields[id] = { v: st[id] ?? null, t }; });
+  try {
+    liveChip("보내는 중…", true);
+    const r = await liveCall({ action: "save", room: w.room, lesson: lesson.no, student: { ban: w.ban, no: w.no, group: w.group },
+      fields, gfields, progress: sheetProgress(lesson, st), submit,
+      summary: submit ? sheetAnswers(lesson, st).map((x) => `${x.q}: ${x.a || "-"}`).join("\n") : undefined });
+    LIVE.connected = true;
+    if (r.gfields) applyGroup(lesson, r.gfields);
+    liveChip(r.submitted ? "제출함 ✓" : "선생님께 연결됨", true);
+    if (submit) { alert("선생님께 제출했어요!"); earnSheetBadge(lesson); }
+  } catch (err) {
+    LIVE.connected = false;
+    liveChip("연결 안 됨", false);
+    if (submit) alert(`제출하지 못했어요. ${err.message}\n그림으로 저장해 두세요.`);
+  }
+}
+
+async function livePullGroup(lesson) {
+  const w = liveWho();
+  if (!w.ready || !w.group) return;
+  const anyGroup = lesson.sheet.parts.some((p, pi) => isGroupPart(lesson, pi));
+  try {
+    const r = await liveCall({ action: "group", room: w.room, lesson: lesson.no, group: w.group });
+    applyGroup(lesson, r.fields || {});
+    // 선생님이 모둠 칸 설정을 바꿨으면 활동지 표시도 바꿈
+    document.querySelectorAll(".sheet-part").forEach((sec) => {
+      const pi = Number(sec.dataset.pi);
+      if (sec.classList.contains("is-group") !== isGroupPart(lesson, pi)) rerenderPart(lesson, pi);
+    });
+    if (!anyGroup) return;
+  } catch { /* 다음 차례에 다시 받아 옴 */ }
+}
+
+// 같은 모둠 친구가 쓴 모둠 칸 내용을 내 활동지에 넣음 (내가 지금 쓰고 있는 칸은 건드리지 않음)
+function applyGroup(lesson, g) {
+  const key = `${cid}/${lesson.no}`;
+  const all = readJSON(SHEET_KEY); const st = all[key] = all[key] ?? {}; st._gt = st._gt ?? {};
+  const changed = new Set();
+  Object.entries(g).forEach(([id, x]) => {
+    if (!x || typeof x !== "object") return;
+    const pi = Number(id.match(/^p(\d+)\./)?.[1] ?? -1);
+    if (!isGroupPart(lesson, pi)) return;
+    if ((st._gt[id] ?? 0) >= Number(x.t)) return;
+    st[id] = x.v; st._gt[id] = Number(x.t); changed.add(pi);
+  });
+  if (!changed.size) return;
+  writeJSON(SHEET_KEY, all);
+  changed.forEach((pi) => rerenderPart(lesson, pi));
+  liveSoon(lesson, 2500);   // 받은 모둠 칸까지 넣어 선생님 화면의 진행 표시를 맞춤
+}
+
+function rerenderPart(lesson, pi) {
+  document.querySelectorAll(`.sheet-part[data-pi="${pi}"]`).forEach((sec) => {
+    if (sec.contains(document.activeElement) && document.activeElement !== document.body) return;
+    const prefix = sec.id.replace(/sheet-p\d+$/, "");
+    const f = document.createElement("div");
+    f.innerHTML = partHtml(lesson, lesson.sheet.parts[pi], pi, sheetState(lesson), { idPrefix: prefix });
+    sec.replaceWith(f.firstElementChild);
+  });
+}
+
+// 칸(문항)마다 썼는지 세어 [쓴 문항, 전체 문항]을 차시 칸(part)별로 돌려줌
+function sheetProgress(lesson, st = sheetState(lesson)) {
+  const has = (id) => Object.keys(st).some((k) => (k === id || k.startsWith(`${id}.`)) && k !== "_gt" && st[k] !== null && st[k] !== "" && st[k] !== false && !(Array.isArray(st[k]) && !st[k].length));
+  return lesson.sheet.parts.map((p, pi) => {
+    const items = p.items.map((it, ii) => ({ it, id: `p${pi}.${ii}` })).filter(({ it }) => it.type !== "info");
+    return [items.filter(({ id }) => has(id)).length, items.length];
+  });
 }
 
 // 활동지에 쓴 내용을 "질문 — 답" 목록으로 바꿈 (그림 저장용)
-function sheetAnswers(lesson) {
-  const st = sheetState(lesson);
+function sheetAnswers(lesson, st = sheetState(lesson)) {
   const out = [];
   const ans = (x) => (x === undefined || x === null || x === "" ? "" : String(x).trim());
   const walk = (it, id, pre) => {
@@ -1734,6 +1896,7 @@ function openSlideMode(lesson, start = 0) {
       <p><span>${lesson.no}${LW()}</span> ${esc(lesson.title)}</p>
       <span class="sm-tools">
         ${lesson.sheet ? `<button type="button" class="sm-btn sm-sheet">활동지</button>` : ""}
+        <a class="sm-btn sm-live" href="${homeHref()}/live/${lesson.no}" target="_blank" rel="noopener">실시간 현황</a>
         <button type="button" class="sm-btn sm-notes" aria-pressed="false">메모</button>
         <button type="button" class="sm-btn sm-full">전체 화면</button>
         <button class="cm-close" type="button" aria-label="수업 모드 닫기">${icon.close}</button>
@@ -1811,4 +1974,191 @@ function openSlideMode(lesson, start = 0) {
   });
   paint();
   overlay.querySelector(".cm-close").focus();
+}
+
+/* ---------- 실시간 현황 (선생님) ----------
+   주소: #/c/{교재}/live/{차시}. 학생 입력을 몇 초마다 받아 와 칸별 진행·제출·모둠 내용을 보여 줌.
+   모둠 활동 칸 설정(개인/모둠)을 바꾸면 학생 화면에 몇 초 안에 반영됨. */
+function renderLive(no) {
+  const lessons = allLessons().filter(({ lesson }) => lesson.sheet);
+  const cur = lessons.find(({ lesson }) => String(lesson.no) === String(no)) ?? lessons[0];
+  if (!cur) { app.innerHTML = `<p class="status">활동지가 있는 차시가 없어요.</p>`; return; }
+  const { lesson } = cur;
+  const saved = readJSON(LIVE_T_KEY);
+  const studentUrl = (room) => `${location.origin}${location.pathname}?view=student${room ? `&room=${encodeURIComponent(room)}` : ""}${homeHref()}/lesson/${encodeURIComponent(cur.unit.id)}/${lesson.no}`;
+
+  if (!LIVE.url) {
+    app.innerHTML = `
+      <nav class="crumb"><a href="${homeHref()}">${esc(course.title)}</a></nav>
+      <section class="live-setup">
+        <h1>실시간 현황</h1>
+        <p>학생들이 활동지에 쓰는 내용을 선생님 화면에서 바로 보려면 실시간 수업 서버를 한 번 연결해야 해요.</p>
+        <ol>
+          <li>교실 링크에 성장 MAP 활동지 기능(<code>/api/snja</code>)을 배포해요.</li>
+          <li>그 주소를 <code>data/site.json</code>의 <code>site.live.url</code>에 넣어요.</li>
+        </ol>
+        <p class="notes-help">연결 전에도 학생 활동지는 기기에 저장되고, "그림으로 저장"으로 모을 수 있어요.</p>
+      </section>`;
+    return;
+  }
+
+  app.innerHTML = `
+    <nav class="crumb"><a href="${homeHref()}">${esc(course.title)}</a> <span>/</span> 실시간 현황</nav>
+    <section class="live">
+      <header class="live-head">
+        <h1>실시간 현황</h1>
+        <form class="live-login" autocomplete="off">
+          <label>참여 코드 <input name="room" value="${esc(saved.room ?? "")}" required maxlength="6" placeholder="교실 링크 6자리"></label>
+          <label>선생님 키 <input name="code" type="password" value="${esc(saved.code ?? "")}" required title="교실 링크 교사 화면의 '실시간 현황' 버튼으로 열면 자동으로 들어가요"></label>
+          <button class="btn-primary" type="submit">연결</button>
+          <span class="live-chip" data-dash-chip>연결 전</span>
+        </form>
+      </header>
+      <nav class="live-lessons" aria-label="차시">${lessons.map(({ unit, lesson: l }) =>
+        `<a href="${homeHref()}/live/${l.no}"${l === lesson ? ` aria-current="page"` : ""}>${l.no}${LW()}<small>${esc(l.title)}</small></a>`).join("")}</nav>
+      <div class="live-grid">
+        <div class="live-main">
+          <div class="live-summary" data-summary></div>
+          <div class="sh-scroll"><table class="live-table" data-table></table></div>
+          <div class="live-groups" data-groups></div>
+        </div>
+        <aside class="live-side">
+          <section class="live-box">
+            <h2>학생 들어오는 곳</h2>
+            <div class="live-qr" data-qr></div>
+            <p class="qr-url" data-url></p>
+            <button class="btn-primary" type="button" data-share>교실 링크로 학생에게 보내기</button>
+            <p class="notes-help">학생은 반·번호·모둠만 쓰면 바로 연결돼요. 이름은 보내지 않아요.</p>
+          </section>
+          <section class="live-box">
+            <h2>모둠 활동 칸 설정</h2>
+            <p class="notes-help">모둠으로 바꾼 칸은 같은 모둠 학생끼리 함께 쓰고, 서로 쓴 내용이 몇 초 뒤 보여요.</p>
+            <ul class="live-parts" data-parts></ul>
+          </section>
+          <section class="live-box">
+            <button class="btn-primary" type="button" data-csv>${icon.download}이 차시 기록 CSV로 받기</button>
+            <p class="notes-help">교실 링크에서 수업을 종료하면 활동지 기록도 함께 지워져요. 끝내기 전에 받아 두세요.</p>
+            <button class="btn-ghost" type="button" data-reset>이 차시 실시간 기록 비우기</button>
+          </section>
+        </aside>
+      </div>
+      <dialog class="live-detail" data-detail></dialog>
+    </section>`;
+  document.title = `실시간 현황 · ${lesson.no}${LW()} · ${course.title}`;
+
+  const form = app.querySelector(".live-login");
+  const chip = app.querySelector("[data-dash-chip]");
+  let data = null, timer = null;
+  const cred = () => readJSON(LIVE_T_KEY);
+
+  const paintLink = () => {
+    const url = studentUrl(cred().room);
+    app.querySelector("[data-url]").textContent = url.replace(/^https?:\/\//, "");
+    const q = app.querySelector("[data-qr]");
+    if (typeof window.qrcode === "function") { const qr = window.qrcode(0, "M"); qr.addData(url); qr.make(); q.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 1, scalable: true, alt: "학생용 QR 코드" }); }
+  };
+  const groupParts = () => {
+    const g = LIVE.config?.groupParts?.[String(lesson.no)];
+    return Array.isArray(g) ? g : lesson.sheet.parts.map((p, pi) => (p.who === "모둠" ? pi : -1)).filter((x) => x >= 0);
+  };
+  const paintParts = () => {
+    const gp = groupParts();
+    app.querySelector("[data-parts]").innerHTML = lesson.sheet.parts.map((p, pi) => `
+      <li><span>${esc(p.title)}</span>
+        <span class="seg" role="group" aria-label="${esc(p.title)} 쓰는 방법">
+          <button type="button" data-pi="${pi}" data-mode="0" aria-pressed="${!gp.includes(pi)}">개인</button>
+          <button type="button" data-pi="${pi}" data-mode="1" aria-pressed="${gp.includes(pi)}">모둠</button>
+        </span></li>`).join("");
+  };
+  const ago = (t) => { const s = Math.max(0, Math.round(((data?.now ?? Date.now()) - t) / 1000)); return s < 60 ? `${s}초 전` : s < 3600 ? `${Math.floor(s / 60)}분 전` : `${Math.floor(s / 3600)}시간 전`; };
+  const bar = ([d, n]) => `<span class="pbar" title="${d}/${n}"><i style="width:${n ? Math.round(d / n * 100) : 0}%"></i><b>${d}/${n}</b></span>`;
+  const paint = () => {
+    if (!data) return;
+    const list = [...data.students].sort((a, b) => (Number(a.group) || 99) - (Number(b.group) || 99) || (Number(a.ban) - Number(b.ban)) || (Number(a.no) - Number(b.no)));
+    const parts = lesson.sheet.parts;
+    const subm = list.filter((x) => x.submitted).length;
+    const active = list.filter((x) => (data.now - x.t) < 60000).length;
+    app.querySelector("[data-summary]").innerHTML = `
+      <span><b>${list.length}</b>명 들어옴</span><span><b>${active}</b>명 지금 쓰는 중</span><span><b>${subm}</b>명 제출</span>`;
+    app.querySelector("[data-table]").innerHTML = list.length ? `
+      <thead><tr><th>모둠</th><th>반-번호</th>${parts.map((p, pi) => `<th>${esc(p.title)}${groupParts().includes(pi) ? " <small>(모둠)</small>" : ""}</th>`).join("")}<th>마지막 입력</th><th>제출</th></tr></thead>
+      <tbody>${list.map((x) => `<tr data-sid="${esc(x.sid)}" tabindex="0">
+        <td>${esc(x.group || "-")}</td><th scope="row">${esc(x.ban)}-${esc(x.no)}</th>
+        ${parts.map((p, pi) => `<td>${bar(x.progress?.[pi] ?? [0, 0])}</td>`).join("")}
+        <td class="${(data.now - x.t) < 60000 ? "is-live" : ""}">${ago(x.t)}</td>
+        <td>${x.submitted ? `<span class="ok">제출 ✓</span>` : ""}</td></tr>`).join("")}</tbody>`
+      : `<caption class="status">아직 들어온 학생이 없어요. 오른쪽 주소나 QR로 학생 화면을 열게 해 주세요.</caption>`;
+    const groups = Object.keys(data.groups ?? {}).sort((a, b) => Number(a) - Number(b));
+    const gp = groupParts();
+    app.querySelector("[data-groups]").innerHTML = gp.length && groups.length ? `
+      <h2>모둠이 함께 쓴 내용</h2>
+      <div class="live-gcards">${groups.map((g) => {
+        const st = {}; Object.entries(data.groups[g] ?? {}).forEach(([id, v]) => { st[id] = v.v; });
+        const ans = sheetAnswers(lesson, st).filter((a) => gp.some((pi) => a.q.startsWith(parts[pi].title)));
+        const members = list.filter((x) => x.group === g).map((x) => `${x.ban}-${x.no}`).join(", ");
+        return `<article class="live-gcard"><h3>${esc(g)}모둠 <small>${esc(members)}</small></h3>
+          ${ans.length ? `<dl>${ans.map((a) => `<dt>${esc(a.q)}</dt><dd>${esc(a.a || "—")}</dd>`).join("")}</dl>` : `<p class="notes-help">아직 쓴 내용이 없어요.</p>`}</article>`;
+      }).join("")}</div>` : "";
+  };
+  const showDetail = (sid) => {
+    const x = data?.students.find((s) => s.sid === sid); if (!x) return;
+    const d = app.querySelector("[data-detail]");
+    d.innerHTML = `<header><h2>${esc(x.ban)}-${esc(x.no)} <small>${esc(x.group ? `${x.group}모둠` : "")}</small></h2>
+      <button type="button" class="cm-close" data-close aria-label="닫기">${icon.close}</button></header>
+      <dl>${sheetAnswers(lesson, x.fields || {}).map((a) => `<dt>${esc(a.q)}</dt><dd>${esc(a.a || "—")}</dd>`).join("")}</dl>`;
+    d.showModal?.();
+  };
+  const load = async () => {
+    const c = cred(); if (!c.room || !c.code) return;
+    try {
+      data = await liveCall({ action: "dash", room: c.room, teacher: c.code, lesson: lesson.no });
+      chip.textContent = "실시간 ●"; chip.classList.add("is-on");
+      paint(); paintParts();
+    } catch (err) { chip.textContent = err.message; chip.classList.remove("is-on"); }
+  };
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(form);
+    writeJSON(LIVE_T_KEY, { room: String(f.get("room")).replace(/[^0-9A-Za-z]/g, "").slice(0, 6).toUpperCase(), code: String(f.get("code")).trim() });
+    paintLink(); load();
+  });
+  app.querySelector("[data-parts]").addEventListener("click", async (e) => {
+    const b = e.target.closest("button[data-pi]"); if (!b) return;
+    const c = cred(); if (!c.room || !c.code) { alert("수업 코드와 선생님 코드로 먼저 연결해 주세요."); return; }
+    const pi = Number(b.dataset.pi); const on = b.dataset.mode === "1";
+    const set = new Set(groupParts()); on ? set.add(pi) : set.delete(pi);
+    const gpAll = { ...(LIVE.config?.groupParts ?? {}), [String(lesson.no)]: [...set].sort() };
+    try { await liveCall({ action: "config", room: c.room, teacher: c.code, config: { ...LIVE.config, groupParts: gpAll } }); paintParts(); paint(); }
+    catch (err) { alert(err.message); }
+  });
+  app.querySelector("[data-table]").addEventListener("click", (e) => { const r = e.target.closest("tr[data-sid]"); if (r) showDetail(r.dataset.sid); });
+  app.querySelector("[data-table]").addEventListener("keydown", (e) => { const r = e.target.closest("tr[data-sid]"); if (r && e.key === "Enter") showDetail(r.dataset.sid); });
+  app.querySelector("[data-detail]").addEventListener("click", (e) => { if (e.target.closest("[data-close]") || e.target.matches("dialog")) e.currentTarget.close(); });
+  app.querySelector("[data-share]").addEventListener("click", async () => {
+    const c = cred(); if (!c.room || !c.code) { alert("참여 코드와 선생님 키로 먼저 연결해 주세요."); return; }
+    try { await liveCall({ action: "share", room: c.room, teacher: c.code, url: studentUrl(c.room), title: `${lesson.no}${LW()} ${lesson.title} 활동지` }); alert("교실 링크로 활동지 링크를 보냈어요. 학생 화면의 '선생님이 보낸 자료'에 보여요."); }
+    catch (err) { alert(err.message); }
+  });
+  app.querySelector("[data-csv]").addEventListener("click", () => {
+    if (!data?.students?.length) { alert("아직 받을 기록이 없어요."); return; }
+    // 학생마다 고른 과제(보충·기본·심화)가 달라 문항이 다를 수 있어 모든 문항을 모아 열을 만듦
+    const per = data.students.map((x) => ({ x, ans: new Map(sheetAnswers(lesson, x.fields || {}).map((a) => [a.q, a.a])) }));
+    const qs = [];
+    per.forEach(({ ans }) => ans.forEach((_, q) => { if (!qs.includes(q)) qs.push(q); }));
+    const rows = [["반", "번호", "모둠", "제출", ...qs]];
+    per.forEach(({ x, ans }) => rows.push([x.ban, x.no, x.group, x.submitted ? new Date(x.submitted).toLocaleString("ko-KR") : "", ...qs.map((q) => ans.get(q) ?? "")]));
+    const csv = "\ufeff" + rows.map((r) => r.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = `${course.title}_${lesson.no}${LW()}_활동지_${cred().room}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+  app.querySelector("[data-reset]").addEventListener("click", async () => {
+    const c = cred(); if (!c.room || !c.code) return;
+    if (!confirm(`${lesson.no}${LW()} 실시간 기록을 비울까요? 학생 기기에 쓴 내용은 그대로 남아요.`)) return;
+    try { await liveCall({ action: "reset", room: c.room, teacher: c.code, lesson: lesson.no }); load(); } catch (err) { alert(err.message); }
+  });
+  paintLink(); paintParts();
+  load();
+  timer = setInterval(() => { if (!document.body.contains(form)) { clearInterval(timer); return; } load(); }, 5000);
 }

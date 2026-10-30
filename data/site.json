@@ -1,7 +1,11 @@
 {
   "site": {
     "title": "성장 MAP",
-    "default": "trade"
+    "default": "trade",
+    "live": {
+      "url": "https://vivid-sage.onpod.ai/api/snja",
+      "name": "교실 링크"
+    }
   },
   "courses": [
     {

@@ -1003,3 +1003,67 @@ a.ri-head:focus-visible, .ri-btn:focus-visible { outline: 3px solid var(--accent
 .sh-card img { width: auto; height: 84px; filter: grayscale(.8); opacity: .65; transition: filter .2s, opacity .2s, transform .2s var(--ease); }
 .sh-card[aria-pressed="true"] img { filter: drop-shadow(0 3px 4px rgba(11, 11, 69, .25)); opacity: 1; transform: rotate(-6deg) scale(1.08); }
 .sh-card[aria-pressed="true"] b::before { content: ""; }
+
+/* ---------- 실시간 수업 ---------- */
+.head-actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s3); margin-top: var(--s5); }
+.head-actions .btn-primary { margin-top: 0; }
+.live-chip { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.live-chip.is-on { background: color-mix(in srgb, var(--p) 14%, var(--surface)); color: var(--p); border-color: color-mix(in srgb, var(--p) 40%, var(--line)); }
+.sheet .sheet-me input[type="text"].me-roomin { width: 6.5em; text-transform: uppercase; letter-spacing: 1px; }
+.sheet-privacy { margin: 0 0 var(--s2); font-size: 0.8125rem; color: var(--muted); }
+.sheet-part.is-group { border-top-color: color-mix(in srgb, var(--m) 50%, var(--line)); }
+.sh-who.is-group { color: #fff; background: var(--m); border-color: var(--m); }
+.sh-group-note { color: var(--m); }
+.live { margin-top: var(--s4); }
+.live-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s4); }
+.live-head h1 { margin: 0; font-family: var(--font-display); font-size: 2.75rem; line-height: 1; }
+.live-login { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+.live-login label { display: inline-flex; align-items: center; gap: 6px; font-size: 0.875rem; font-weight: 700; }
+.live-login input { width: 8.5em; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); font: inherit; }
+.live-login .btn-primary { margin: 0; min-height: 40px; }
+.live-lessons { display: flex; gap: 8px; overflow-x: auto; margin: var(--s5) 0; padding-bottom: 4px; }
+.live-lessons a { flex: none; display: flex; flex-direction: column; padding: 8px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); text-decoration: none; font-weight: 700; }
+.live-lessons a small { font-weight: 400; color: var(--muted); font-size: 0.75rem; }
+.live-lessons a[aria-current="page"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.live-grid { display: grid; gap: var(--s5); }
+@media (min-width: 1000px) { .live-grid { grid-template-columns: 1fr 18rem; } }
+.live-summary { display: flex; flex-wrap: wrap; gap: var(--s4); margin-bottom: var(--s3); color: var(--ink-2); }
+.live-summary b { font-size: 1.5rem; color: var(--ink); }
+.live-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; background: var(--surface); }
+.live-table th, .live-table td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: left; white-space: nowrap; }
+.live-table thead th { font-size: 0.75rem; color: var(--muted); }
+.live-table thead th small { color: var(--m); }
+.live-table tbody tr { cursor: pointer; }
+.live-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.live-table td.is-live { color: var(--p); font-weight: 700; }
+.live-table .ok { color: var(--p); font-weight: 700; }
+.pbar { position: relative; display: inline-block; width: 74px; height: 18px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; vertical-align: middle; }
+.pbar i { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--accent) 45%, transparent); }
+.pbar b { position: relative; display: block; text-align: center; font-size: 0.6875rem; line-height: 16px; }
+.live-side { display: grid; gap: var(--s4); align-content: start; }
+.live-box { padding: var(--s4); border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.live-box h2 { margin: 0 0 var(--s2); font-size: 1rem; }
+.live-box .btn-primary, .live-box .btn-ghost { margin: var(--s2) 0 0; width: 100%; justify-content: center; min-height: 42px; }
+.live-qr svg { width: 100%; max-width: 180px; height: auto; display: block; margin: 0 auto; }
+.live-box .qr-url { font-size: 0.75rem; word-break: break-all; color: var(--muted); }
+.live-parts { list-style: none; margin: var(--s2) 0 0; padding: 0; display: grid; gap: 8px; }
+.live-parts li { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 0.875rem; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; flex: none; }
+.seg button { border: 0; background: var(--surface); padding: 4px 10px; font: inherit; font-size: 0.8125rem; font-weight: 700; cursor: pointer; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.seg button[data-mode="1"][aria-pressed="true"] { background: var(--m); }
+.live-groups h2 { margin: var(--s6) 0 var(--s3); font-family: var(--font-display); font-size: 1.75rem; }
+.live-gcards { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+.live-gcard { padding: var(--s4); border-radius: 14px; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--m); }
+.live-gcard h3 { margin: 0 0 var(--s2); font-size: 1rem; }
+.live-gcard h3 small, .live-detail h2 small { font-weight: 400; color: var(--muted); font-size: 0.8125rem; }
+.live-gcard dl, .live-detail dl { margin: 0; font-size: 0.875rem; }
+.live-gcard dt, .live-detail dt { font-weight: 700; color: var(--ink-2); margin-top: var(--s2); }
+.live-gcard dd, .live-detail dd { margin: 2px 0 0; white-space: pre-wrap; color: var(--ink); }
+.live-detail { width: min(40rem, 92vw); max-height: 85vh; border: 0; border-radius: 18px; padding: var(--s5); background: var(--surface); color: var(--ink); }
+.live-detail::backdrop { background: rgba(11, 11, 26, .45); }
+.live-detail header { display: flex; justify-content: space-between; align-items: center; }
+.live-detail h2 { margin: 0; }
+.live-setup { max-width: 40rem; margin: var(--s6) 0; }
+.live-setup h1 { font-family: var(--font-display); font-size: 2.75rem; margin: 0 0 var(--s3); }
+.sm-live { display: inline-flex; align-items: center; text-decoration: none; }
