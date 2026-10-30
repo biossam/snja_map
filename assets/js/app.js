@@ -1562,7 +1562,8 @@ function sheetHtml(lesson, opts = {}) {
       </div>
       ${live ? `<p class="sheet-privacy">이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.</p>` : ""}`}
       ${parts}
-      ${opts.readonly ? "" : `<div class="sheet-tools">
+      ${opts.readonly ? "" : `<div class="sheet-progress" data-sheet-progress aria-live="polite"></div>
+      <div class="sheet-tools">
         ${live ? `<button class="btn-primary" type="button" data-sheet-submit>${icon.right}선생님께 제출</button>` : ""}
         <button class="${live ? "btn-ghost" : "btn-primary"}" type="button" data-sheet-save>${icon.download}활동지 그림으로 저장</button>
         <button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>
@@ -1668,8 +1669,10 @@ function bindSheet(lesson, root = document) {
     // 모둠 칸이 바뀌면 바뀐 시각을 남겨 같은 모둠 친구 화면과 맞춤
     if (changedId && isGroupPart(lesson, partOf(changedId))) { all[key]._gt = all[key]._gt ?? {}; all[key]._gt[changedId] = Date.now(); }
     say(writeJSON(SHEET_KEY, all) ? "저장했어요" : "이 기기에 저장할 수 없어요. 그림으로 저장해 두세요.");
+    paintSheetProgress(lesson, box);
     liveSoon(lesson);
   };
+  paintSheetProgress(lesson, box);
   box.addEventListener("input", (e) => {
     const t = e.target;
     if (t.dataset.me) {
@@ -1697,7 +1700,11 @@ function bindSheet(lesson, root = document) {
       return;
     }
     if (e.target.closest("[data-sheet-save]")) return saveSheetImage(lesson);
-    if (e.target.closest("[data-sheet-submit]")) return liveSync(lesson, true);
+    if (e.target.closest("[data-sheet-submit]")) {
+      const left = sheetLeft(lesson);
+      if (left.length && !confirm(`아직 비어 있는 곳이 있어요.\n${left.map((x) => `· ${x}`).join("\n")}\n\n그래도 선생님께 보낼까요?`)) return;
+      return liveSync(lesson, true);
+    }
     if (e.target.closest("[data-sheet-clear]")) {
       if (!confirm("이 차시 활동지에 쓴 내용을 모두 지울까요?")) return;
       const all = readJSON(SHEET_KEY); delete all[key]; writeJSON(SHEET_KEY, all);
@@ -1793,6 +1800,7 @@ function applyGroup(lesson, g) {
   if (!changed.size) return;
   writeJSON(SHEET_KEY, all);
   changed.forEach((pi) => rerenderPart(lesson, pi));
+  document.querySelectorAll(".sheet").forEach((b) => paintSheetProgress(lesson, b));
   liveSoon(lesson, 2500);   // 받은 모둠 칸까지 넣어 선생님 화면의 진행 표시를 맞춤
 }
 
@@ -1804,6 +1812,29 @@ function rerenderPart(lesson, pi) {
     f.innerHTML = partHtml(lesson, lesson.sheet.parts[pi], pi, sheetState(lesson), { idPrefix: prefix });
     sec.replaceWith(f.firstElementChild);
   });
+}
+
+// 아직 안 쓴 칸 이름 목록 ("분류판 (2칸 남음)")
+function sheetLeft(lesson) {
+  return sheetProgress(lesson).map(([d, n], pi) => (d < n ? `${lesson.sheet.parts[pi].title} (${n - d}칸 남음)` : "")).filter(Boolean);
+}
+
+// 활동지 아래 진행 막대. 다 채우면 "선생님께 보내기"를 크게 알려 줌
+function paintSheetProgress(lesson, box) {
+  const el = box.querySelector("[data-sheet-progress]");
+  if (!el) return;
+  const pr = sheetProgress(lesson);
+  const done = pr.reduce((a, [d]) => a + d, 0), total = pr.reduce((a, [, n]) => a + n, 0);
+  const full = total > 0 && done === total;
+  const live = Boolean(LIVE.url) && isStudent;
+  el.classList.toggle("is-full", full);
+  el.innerHTML = `
+    <div class="sp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
+    <p>${full
+      ? `🎉 활동지를 다 채웠어요! ${live ? "아래 <b>선생님께 제출</b>을 눌러 보내요." : "그림으로 저장해 선생님께 보내요."}`
+      : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
+  box.querySelector("[data-sheet-submit]")?.classList.toggle("is-ready", full);
+  box.querySelector("[data-sheet-save]")?.classList.toggle("is-ready", full && !live);
 }
 
 // 칸(문항)마다 썼는지 세어 [쓴 문항, 전체 문항]을 차시 칸(part)별로 돌려줌

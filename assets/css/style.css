@@ -1067,3 +1067,15 @@ a.ri-head:focus-visible, .ri-btn:focus-visible { outline: 3px solid var(--accent
 .live-setup { max-width: 40rem; margin: var(--s6) 0; }
 .live-setup h1 { font-family: var(--font-display); font-size: 2.75rem; margin: 0 0 var(--s3); }
 .sm-live { display: inline-flex; align-items: center; text-decoration: none; }
+
+/* 활동지 진행 막대와 다 채웠을 때 */
+.sheet-progress { margin-top: var(--s6); padding: var(--s3) var(--s4); border-radius: 14px; background: var(--bg); }
+.sheet-progress p { margin: var(--s2) 0 0; font-size: 0.9375rem; color: var(--ink-2); }
+.sp-bar { height: 12px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.sp-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .4s var(--ease); }
+.sheet-progress.is-full { background: color-mix(in srgb, var(--m) 12%, var(--surface)); }
+.sheet-progress.is-full .sp-bar i { background: var(--m); }
+.sheet-progress.is-full p { color: var(--ink); font-weight: 700; }
+.sheet-progress + .sheet-tools { margin-top: var(--s4); }
+.sheet-tools .is-ready { background: var(--m); border-color: var(--m); color: #fff; animation: sm-pulse 1.4s ease-in-out 3; }
+.sm-sheet-view .sheet-progress { display: none; }
