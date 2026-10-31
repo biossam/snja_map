@@ -10,7 +10,7 @@
    "수업 활동지: Claude로 제작"
   ],
   "materials": {
-   "label": "수업 지도안·PPT",
+   "label": "수업 지도안·PPT·활동지",
    "source": "경기형 AI 교수·학습 플랫폼",
    "url": "https://hi.goe.go.kr/contentlibrary/recommended"
   },
@@ -20,7 +20,8 @@
    "url": "https://creativecommons.org/licenses/by-nc/4.0/deed.ko"
   },
   "slideCourse": true,
-  "slidesTeacherOnly": true
+  "slidesTeacherOnly": true,
+  "platformOnly": true
  },
  "units": [
   {
@@ -71,10 +72,7 @@
        "title": "AI는? 나는?"
       }
      ],
-     "teacher": {
-      "ppt": "files/humanskill/1/ppt.pptx",
-      "worksheet": "files/humanskill/1/worksheet.hwpx"
-     },
+     "teacher": {},
      "artist": {
       "name": "뱅크시",
       "life": "영국 · 얼굴을 밝히지 않은 거리 예술가",
@@ -283,10 +281,7 @@
        "title": "AI는? 나는?"
       }
      ],
-     "teacher": {
-      "ppt": "files/humanskill/2/ppt.pptx",
-      "worksheet": "files/humanskill/2/worksheet.hwpx"
-     },
+     "teacher": {},
      "artist": {
       "name": "슬링카추",
       "life": "영국 런던 · 거리 미니어처 작가",
@@ -501,10 +496,7 @@
        "title": "AI는? 나는?"
       }
      ],
-     "teacher": {
-      "ppt": "files/humanskill/3/ppt.pptx",
-      "worksheet": "files/humanskill/3/worksheet.hwpx"
-     },
+     "teacher": {},
      "artist": {
       "name": "유영국",
       "life": "한국 · 1916~2002",
@@ -721,10 +713,7 @@
        "title": "AI는? 나는?"
       }
      ],
-     "teacher": {
-      "ppt": "files/humanskill/4/ppt.pptx",
-      "worksheet": "files/humanskill/4/worksheet.hwpx"
-     },
+     "teacher": {},
      "artist": {
       "name": "장한나",
       "life": "한국 · 환경 미술 작가",
@@ -958,10 +947,7 @@
        "title": "AI는? 나는?"
       }
      ],
-     "teacher": {
-      "ppt": "files/humanskill/5/ppt.pptx",
-      "worksheet": "files/humanskill/5/worksheet.hwpx"
-     },
+     "teacher": {},
      "artist": {
       "name": "사야카 간즈",
       "life": "일본 출생 · 미국에서 활동하는 조각가",
@@ -1172,10 +1158,7 @@
        "title": "AI는? 나는?"
       }
      ],
-     "teacher": {
-      "ppt": "files/humanskill/6/ppt.pptx",
-      "worksheet": "files/humanskill/6/worksheet.hwpx"
-     },
+     "teacher": {},
      "artist": {
       "name": "크리스 조던",
       "life": "미국 · 사진가, 환경 예술가",

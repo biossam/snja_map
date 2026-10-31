@@ -370,6 +370,7 @@ function renderHome() {
       <p class="intro-note">${[course.grade, course.subject].filter(Boolean).map(esc).join(" ")}${course.grade || course.subject ? ", " : ""}${lessonCount}${LW()}${course.author ? ` · ${esc(course.author)}` : ""}.
         ${isStudent
           ? (course.slideCourse ? `${LW()}를 골라 PPT를 다시 보고 활동지에 바로 쓸 수 있어요.` : `${LW()}${LW() === "편" ? "을" : "를"} 골라 수업 영상을 다시 볼 수 있어요.`)
+          : course.platformOnly ? `${LW()}마다 수업 PPT와 영상, 활동지를 수업 모드에서 함께 띄울 수 있습니다. 지도안·PPT·활동지 파일은 ${esc(course.materials?.source || "외부 플랫폼")}에서 받을 수 있어요.`
           : course.slideCourse ? `${LW()}마다 수업 PPT와 활동지를 내려받고, 수업 모드에서 PPT와 활동지를 함께 띄울 수 있습니다.` : (course.noWorksheet ? `${LW()}마다 수업 영상을 파트별로 보며 활동할 수 있습니다.` : `${LW()}마다 수업 영상을 보고 활동지를 무료로 받을 수 있습니다.`)}</p>
       ${course.keyQuestion ? `<div class="key-question"><span>핵심 질문</span>${esc(course.keyQuestion)}</div>` : ""}
       ${(course.points ?? []).length ? `<div class="points"><p class="points-title">모아 보는 칭찬포인트</p><ul>${course.points.map((x) => `<li title="${esc(x.desc || "")}">${x.img ? `<img src="${esc(x.img)}" alt="" width="60" height="72" loading="lazy">` : ""}<b>${esc(x.name)}</b><small>${esc(x.desc || "")}</small></li>`).join("")}</ul></div>` : ""}
@@ -493,7 +494,8 @@ function teacherSection(lesson) {
   if (isStudent) return "";
   const t = lesson.teacher ?? {};
   // course.noWorksheet: 활동지가 없는 교재는 활동지 칸을 보여 주지 않음
-  const files = course.noWorksheet ? [] : [
+  // course.platformOnly: 지도안·PPT·활동지를 사이트에서 직접 주지 않고 외부 플랫폼으로만 안내
+  const files = course.noWorksheet || course.platformOnly ? [] : [
     ...(t.ppt || lesson.slides ? [{ label: "수업 PPT", url: t.ppt, kind: "PowerPoint" }] : []),
     { label: "수업 활동지", url: t.worksheet, kind: "Word" },
   ];
