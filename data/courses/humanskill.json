@@ -21,7 +21,9 @@
   },
   "slideCourse": true,
   "slidesTeacherOnly": true,
-  "platformOnly": true
+  "platformOnly": true,
+  "keyQuestion": "AI는 결과를 빠르게 만들지만, 작품의 의미는 예술가(나)가 직접 고르고 나누고 돌아보는 과정에서 생겨난다.",
+  "keyLabel": "단원 핵심 문장"
  },
  "units": [
   {
