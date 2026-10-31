@@ -19,6 +19,13 @@
       "grade": 6,
       "title": "휴먼스킬아트",
       "file": "data/courses/humanskill.json"
+    },
+    {
+      "id": "artist",
+      "grade": 6,
+      "title": "어느 날 눈떠보니 예술가가 되었다",
+      "tab": "어느 날 눈떠보니 예술가",
+      "file": "data/courses/artist.json"
     }
   ]
 }
