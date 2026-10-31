@@ -1583,7 +1583,8 @@ function sheetHtml(lesson, opts = {}) {
         ${live ? `<label class="me-room">참여 코드 <input type="text" data-me="room" value="${esc(me.room ?? "")}" maxlength="6" autocapitalize="characters" aria-label="교실 링크 참여 코드" class="me-roomin"></label>
           <span class="live-chip" data-live-chip>연결 안 됨</span>` : ""}
       </div>
-      ${live ? `<p class="sheet-privacy">이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.</p>` : ""}`}
+      ${live ? `<p class="sheet-privacy">이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.</p>` : ""}
+      ${isStudent && (course.points ?? []).length ? `<div class="my-points" data-my-points hidden></div>` : ""}`}
       ${parts}
       ${opts.readonly ? "" : `<div class="sheet-progress" data-sheet-progress aria-live="polite"></div>
       <div class="sheet-tools">
@@ -1696,6 +1697,7 @@ function bindSheet(lesson, root = document) {
     liveSoon(lesson);
   };
   paintSheetProgress(lesson, box);
+  paintMyPoints();
   box.addEventListener("input", (e) => {
     const t = e.target;
     if (t.dataset.me) {
@@ -1783,6 +1785,7 @@ async function liveSync(lesson, submit = false) {
       summary: submit ? sheetAnswers(lesson, st).map((x) => `${x.q}: ${x.a || "-"}`).join("\n") : undefined });
     LIVE.connected = true;
     if (r.gfields) applyGroup(lesson, r.gfields);
+    receivePoints(r.points);
     liveChip(r.submitted ? "제출함 ✓" : "선생님께 연결됨", true);
     if (submit) { alert("선생님께 제출했어요!"); earnSheetBadge(lesson); }
   } catch (err) {
@@ -1794,11 +1797,12 @@ async function liveSync(lesson, submit = false) {
 
 async function livePullGroup(lesson) {
   const w = liveWho();
-  if (!w.ready || !w.group) return;
+  if (!w.ready) return;
   const anyGroup = lesson.sheet.parts.some((p, pi) => isGroupPart(lesson, pi));
   try {
-    const r = await liveCall({ action: "group", room: w.room, lesson: lesson.no, group: w.group });
+    const r = await liveCall({ action: "group", room: w.room, lesson: lesson.no, group: w.group, student: { ban: w.ban, no: w.no } });
     applyGroup(lesson, r.fields || {});
+    receivePoints(r.points);
     // 선생님이 모둠 칸 설정을 바꿨으면 활동지 표시도 바꿈
     document.querySelectorAll(".sheet-part").forEach((sec) => {
       const pi = Number(sec.dataset.pi);
@@ -2138,6 +2142,8 @@ function renderLive(no) {
   };
   const ago = (t) => { const s = Math.max(0, Math.round(((data?.now ?? Date.now()) - t) / 1000)); return s < 60 ? `${s}초 전` : s < 3600 ? `${Math.floor(s / 60)}분 전` : `${Math.floor(s / 3600)}시간 전`; };
   const bar = ([d, n]) => `<span class="pbar" title="${d}/${n}"><i style="width:${n ? Math.round(d / n * 100) : 0}%"></i><b>${d}/${n}</b></span>`;
+  const pts = course.points ?? [];
+  const givenHere = (x) => (x.points ?? []).filter((g) => Number(g.lesson) === Number(lesson.no)).map((g) => g.point);
   const paint = () => {
     if (!data) return;
     const list = [...data.students].sort((a, b) => (Number(a.group) || 99) - (Number(b.group) || 99) || (Number(a.ban) - Number(b.ban)) || (Number(a.no) - Number(b.no)));
@@ -2147,30 +2153,38 @@ function renderLive(no) {
     app.querySelector("[data-summary]").innerHTML = `
       <span><b>${list.length}</b>명 들어옴</span><span><b>${active}</b>명 지금 쓰는 중</span><span><b>${subm}</b>명 제출</span>`;
     app.querySelector("[data-table]").innerHTML = list.length ? `
-      <thead><tr><th>모둠</th><th>반-번호</th>${parts.map((p, pi) => `<th>${esc(p.title)}${groupParts().includes(pi) ? " <small>(모둠)</small>" : ""}</th>`).join("")}<th>마지막 입력</th><th>제출</th></tr></thead>
+      <thead><tr><th>모둠</th><th>반-번호</th>${parts.map((p, pi) => `<th>${esc(p.title)}${groupParts().includes(pi) ? " <small>(모둠)</small>" : ""}</th>`).join("")}<th>마지막 입력</th><th>제출</th>${pts.length ? "<th>칭찬포인트</th>" : ""}</tr></thead>
       <tbody>${list.map((x) => `<tr data-sid="${esc(x.sid)}" tabindex="0">
         <td>${esc(x.group || "-")}</td><th scope="row">${esc(x.ban)}-${esc(x.no)}</th>
         ${parts.map((p, pi) => `<td>${bar(x.progress?.[pi] ?? [0, 0])}</td>`).join("")}
         <td class="${(data.now - x.t) < 60000 ? "is-live" : ""}">${ago(x.t)}</td>
-        <td>${x.submitted ? `<span class="ok">제출 ✓</span>` : ""}</td></tr>`).join("")}</tbody>`
+        <td>${x.submitted ? `<span class="ok">제출 ✓</span>` : ""}</td>
+        ${pts.length ? `<td class="pt-cell">${givenHere(x).map((g) => pointImg(pointById(g), "pt-mini")).join("")}${(() => { const rec = recommendPoints(lesson, x.fields || {}).filter((id) => !givenHere(x).includes(id)); return rec.length ? `<span class="pt-rec">추천 ${rec.length}</span>` : ""; })()}</td>` : ""}</tr>`).join("")}</tbody>`
       : `<caption class="status">아직 들어온 학생이 없어요. 오른쪽 주소나 QR로 학생 화면을 열게 해 주세요.</caption>`;
     const groups = Object.keys(data.groups ?? {}).sort((a, b) => Number(a) - Number(b));
     const gp = groupParts();
-    app.querySelector("[data-groups]").innerHTML = gp.length && groups.length ? `
+    app.querySelector("[data-groups]").innerHTML = (gp.length || pts.some((p) => p.group)) && groups.length ? `
       <h2>모둠이 함께 쓴 내용</h2>
       <div class="live-gcards">${groups.map((g) => {
         const st = {}; Object.entries(data.groups[g] ?? {}).forEach(([id, v]) => { st[id] = v.v; });
         const ans = sheetAnswers(lesson, st).filter((a) => gp.some((pi) => a.q.startsWith(parts[pi].title)));
         const members = list.filter((x) => x.group === g).map((x) => `${x.ban}-${x.no}`).join(", ");
-        return `<article class="live-gcard"><h3>${esc(g)}모둠 <small>${esc(members)}</small></h3>
+        const gp2 = pts.filter((p) => p.group);
+        const gbtn = gp2.length ? `<div class="pt-group">${gp2.map((p) => `<button type="button" class="pt-give-group" data-group="${esc(g)}" data-point="${esc(p.id)}">${pointImg(p, "pt-mini")}모둠 전체에 「${esc(p.name)}」</button>`).join("")}</div>` : "";
+        return `<article class="live-gcard"><h3>${esc(g)}모둠 <small>${esc(members)}</small></h3>${gbtn}
           ${ans.length ? `<dl>${ans.map((a) => `<dt>${esc(a.q)}</dt><dd>${esc(a.a || "—")}</dd>`).join("")}</dl>` : `<p class="notes-help">아직 쓴 내용이 없어요.</p>`}</article>`;
       }).join("")}</div>` : "";
   };
   const showDetail = (sid) => {
     const x = data?.students.find((s) => s.sid === sid); if (!x) return;
     const d = app.querySelector("[data-detail]");
+    const rec = recommendPoints(lesson, x.fields || {});
+    const given = givenHere(x);
     d.innerHTML = `<header><h2>${esc(x.ban)}-${esc(x.no)} <small>${esc(x.group ? `${x.group}모둠` : "")}</small></h2>
       <button type="button" class="cm-close" data-close aria-label="닫기">${icon.close}</button></header>
+      ${pts.length ? `<section class="pt-give"><h3>칭찬포인트 주기 <small>답을 확인하고 눌러요. 다시 누르면 거둬요.</small></h3>
+        <div class="pt-buttons">${pts.map((p) => `<button type="button" class="pt-btn${rec.includes(p.id) ? " is-rec" : ""}" data-sid="${esc(x.sid)}" data-point="${esc(p.id)}" aria-pressed="${given.includes(p.id)}" title="${esc(course.pointRules?.[p.id]?.why || p.desc || "")}">
+          ${pointImg(p)}<b>${esc(p.name)}</b>${rec.includes(p.id) ? `<span class="pt-rec">추천</span>` : ""}</button>`).join("")}</div></section>` : ""}
       <dl>${sheetAnswers(lesson, x.fields || {}).map((a) => `<dt>${esc(a.q)}</dt><dd>${esc(a.a || "—")}</dd>`).join("")}</dl>`;
     d.showModal?.();
   };
@@ -2199,7 +2213,25 @@ function renderLive(no) {
   });
   app.querySelector("[data-table]").addEventListener("click", (e) => { const r = e.target.closest("tr[data-sid]"); if (r) showDetail(r.dataset.sid); });
   app.querySelector("[data-table]").addEventListener("keydown", (e) => { const r = e.target.closest("tr[data-sid]"); if (r && e.key === "Enter") showDetail(r.dataset.sid); });
-  app.querySelector("[data-detail]").addEventListener("click", (e) => { if (e.target.closest("[data-close]") || e.target.matches("dialog")) e.currentTarget.close(); });
+  const givePoint = async (sids, point, on) => {
+    const c = cred();
+    try {
+      const r = await liveCall({ action: "point", room: c.room, teacher: c.code, lesson: lesson.no, sids, point, on });
+      Object.entries(r.points ?? {}).forEach(([sid, list]) => { const st = data?.students.find((s) => s.sid === sid); if (st) st.points = list; });
+      paint(); return true;
+    } catch (err) { alert(err.message); return false; }
+  };
+  app.querySelector("[data-detail]").addEventListener("click", async (e) => {
+    const b = e.target.closest(".pt-btn");
+    if (b) { const on = b.getAttribute("aria-pressed") !== "true"; if (await givePoint([b.dataset.sid], b.dataset.point, on)) b.setAttribute("aria-pressed", String(on)); return; }
+    if (e.target.closest("[data-close]") || e.target.matches("dialog")) e.currentTarget.close();
+  });
+  app.querySelector("[data-groups]").addEventListener("click", async (e) => {
+    const b = e.target.closest(".pt-give-group"); if (!b || !data) return;
+    const sids = data.students.filter((s) => s.group === b.dataset.group).map((s) => s.sid);
+    const p = pointById(b.dataset.point);
+    if (sids.length && confirm(`${b.dataset.group}모둠 ${sids.length}명에게 「${p?.name}」를 줄까요?`)) givePoint(sids, b.dataset.point, true);
+  });
   app.querySelector("[data-share]").addEventListener("click", async () => {
     const c = cred(); if (!c.room || !c.code) { alert("참여 코드와 선생님 키로 먼저 연결해 주세요."); return; }
     try { await liveCall({ action: "share", room: c.room, teacher: c.code, url: studentUrl(c.room), title: `${lesson.no}${LW()} ${lesson.title} 활동지` }); alert("교실 링크로 활동지 링크를 보냈어요. 학생 화면의 '선생님이 보낸 자료'에 보여요."); }
@@ -2211,8 +2243,9 @@ function renderLive(no) {
     const per = data.students.map((x) => ({ x, ans: new Map(sheetAnswers(lesson, x.fields || {}).map((a) => [a.q, a.a])) }));
     const qs = [];
     per.forEach(({ ans }) => ans.forEach((_, q) => { if (!qs.includes(q)) qs.push(q); }));
-    const rows = [["반", "번호", "모둠", "제출", ...qs]];
-    per.forEach(({ x, ans }) => rows.push([x.ban, x.no, x.group, x.submitted ? new Date(x.submitted).toLocaleString("ko-KR") : "", ...qs.map((q) => ans.get(q) ?? "")]));
+    const rows = [["반", "번호", "모둠", "제출", ...(pts.length ? ["칭찬포인트(이 차시)"] : []), ...qs]];
+    per.forEach(({ x, ans }) => rows.push([x.ban, x.no, x.group, x.submitted ? new Date(x.submitted).toLocaleString("ko-KR") : "",
+      ...(pts.length ? [givenHere(x).map((g) => pointById(g)?.name ?? g).join(", ")] : []), ...qs.map((q) => ans.get(q) ?? "")]));
     const csv = "\ufeff" + rows.map((r) => r.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
@@ -2227,4 +2260,89 @@ function renderLive(no) {
   paintLink(); paintParts();
   load();
   timer = setInterval(() => { if (!document.body.contains(form)) { clearInterval(timer); return; } load(); }, 5000);
+}
+
+/* ---------- 칭찬포인트 (선생님이 실시간 현황에서 줌) ----------
+   course.points: [{id, name, desc, img, group}]  course.pointRules: 추천 기준 (선생님 판단을 돕는 표시일 뿐 자동으로 주지 않음) */
+const POINTS_KEY = "snja-points-v1";
+const pointById = (id) => (course.points ?? []).find((p) => p.id === id);
+const filled = (v) => !(v === undefined || v === null || v === "" || v === false || (Array.isArray(v) && !v.length));
+// 문장을 끝까지 완성했는지: 10자 이상이고 "~다/~요/~까" 같은 끝맺음으로 끝남
+const isSentence = (v) => typeof v === "string" && v.trim().length >= 10 && /(다|요|죠|까|네)\s*[.!?~]*$/.test(v.trim());
+
+// 활동지의 모든 칸을 [{id, item}]로 펼침 (보충·기본·심화 안의 칸 포함)
+function sheetItems(lesson) {
+  const out = [];
+  const walk = (it, id) => {
+    out.push({ id, item: it });
+    if (it.type === "tier") it.tiers.forEach((t, k) => t.items.forEach((x, j) => walk(x, `${id}.t${k}.${j}`)));
+  };
+  (lesson.sheet?.parts ?? []).forEach((p, pi) => p.items.forEach((it, ii) => walk(it, `p${pi}.${ii}`)));
+  return out;
+}
+
+function recommendPoints(lesson, f = {}) {
+  const rules = course.pointRules ?? {};
+  const out = [];
+  Object.entries(rules).forEach(([id, r]) => {
+    if (r.lessons && !r.lessons.includes(lesson.no)) return;
+    let ok = false;
+    if (r.type === "originTable") {
+      for (let row = 1; row <= 9 && !ok; row++) ok = filled(f[`${r.id}.${row}.2`]) && (Boolean(f[`${r.id}.${row}.3`]) !== Boolean(f[`${r.id}.${row}.4`]));
+    } else if (r.type === "allFilled") ok = r.ids.every((x) => filled(f[x]));
+    else if (r.type === "sentenceAny") ok = r.ids.some((x) => isSentence(f[x]));
+    else if (r.type === "reasonSentence") {
+      ok = sheetItems(lesson).some(({ id: x, item }) => {
+        if (item.type === "text" && /까닭|이유|왜|근거|추측/.test(item.label)) return isSentence(f[x]);
+        if (item.type === "fill" && /왜냐하면/.test(item.text)) {
+          const n = (item.text.match(/\{\}/g) || []).length;
+          const blanks = Array.from({ length: n }, (_, k) => String(f[`${x}.${k}`] ?? "").trim());
+          return blanks.every(Boolean) && blanks[blanks.length - 1].length >= 5;
+        }
+        return false;
+      });
+    }
+    if (ok) out.push(id);
+  });
+  return out;
+}
+
+const pointImg = (p, cls = "pt-img") => p?.img ? `<img class="${cls}" src="${esc(p.img)}" alt="" loading="lazy">` : "";
+
+// 학생: 서버에서 받은 내 칭찬포인트를 기기에 모으고, 새로 받은 것은 알려 줌
+function receivePoints(list) {
+  if (!Array.isArray(list) || !(course.points ?? []).length) return;
+  const all = readJSON(POINTS_KEY); const key = cid;
+  const before = new Set((all[key] ?? []).map((x) => `${x.point}/${x.lesson}`));
+  all[key] = list; writeJSON(POINTS_KEY, all);
+  const fresh = list.filter((x) => !before.has(`${x.point}/${x.lesson}`));
+  paintMyPoints();
+  if (fresh.length && before.size + fresh.length > 0) {
+    const p = pointById(fresh[fresh.length - 1].point);
+    if (p) pointToast(p);
+  }
+}
+
+function pointToast(p) {
+  document.querySelector(".badge-toast")?.remove();
+  const t = document.createElement("div");
+  t.className = "badge-toast";
+  t.setAttribute("role", "status");
+  t.innerHTML = `${pointImg(p, "toast-badge")}<p><b>칭찬포인트 「${esc(p.name)}」를 받았어요!</b><span>${esc(p.desc || "")}</span></p>
+    <button type="button" aria-label="닫기">${icon.close}</button>`;
+  t.querySelector("button").addEventListener("click", () => t.remove());
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add("is-in"));
+  setTimeout(() => t.remove(), 7000);
+}
+
+function paintMyPoints() {
+  if (!isStudent) return;
+  const mine = readJSON(POINTS_KEY)[cid] ?? [];
+  document.querySelectorAll("[data-my-points]").forEach((el) => {
+    el.hidden = !mine.length;
+    el.innerHTML = mine.length ? `<span class="mp-label">내가 받은 칭찬포인트</span>${mine.map((x) => {
+      const p = pointById(x.point); return p ? `<span class="mp-item" title="${esc(p.name)} · ${x.lesson}${LW()}">${pointImg(p)}<small>${esc(p.name)}</small></span>` : "";
+    }).join("")}` : "";
+  });
 }

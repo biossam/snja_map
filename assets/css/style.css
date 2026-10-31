@@ -1094,3 +1094,28 @@ a.ri-head:focus-visible, .ri-btn:focus-visible { outline: 3px solid var(--accent
 .sm-video-view[hidden] { display: none; }
 .sm-video-view iframe { width: min(100%, calc((100vh - 160px) * 16 / 9)); aspect-ratio: 16 / 9; border: 0; border-radius: 8px; background: #000; }
 .key-question { font-size: 1.375rem; }
+
+/* 칭찬포인트 */
+.pt-cell { white-space: nowrap; }
+.pt-mini { width: auto; height: 26px; vertical-align: middle; margin-right: 2px; }
+.pt-rec { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: 999px; background: var(--m); color: #fff; font-size: 0.6875rem; font-weight: 700; line-height: 1.7; }
+.pt-give { margin: var(--s4) 0; padding: var(--s3); border-radius: 14px; background: var(--bg); }
+.pt-give h3 { margin: 0 0 var(--s2); font-size: 0.9375rem; }
+.pt-give h3 small { font-weight: 400; color: var(--muted); }
+.pt-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 8px; }
+.pt-btn { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 0.8125rem; cursor: pointer; }
+.pt-btn .pt-img { height: 52px; width: auto; filter: grayscale(.9); opacity: .55; transition: filter .2s, opacity .2s, transform .2s var(--ease); }
+.pt-btn.is-rec { border-color: color-mix(in srgb, var(--m) 60%, var(--line)); }
+.pt-btn .pt-rec { position: absolute; top: -8px; right: -6px; margin: 0; }
+.pt-btn[aria-pressed="true"] { border-color: var(--p); background: color-mix(in srgb, var(--p) 10%, var(--surface)); }
+.pt-btn[aria-pressed="true"] .pt-img { filter: none; opacity: 1; transform: rotate(-6deg) scale(1.06); }
+.pt-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 var(--s2); }
+.pt-give-group { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font: inherit; font-size: 0.75rem; cursor: pointer; }
+.pt-give-group:hover { border-color: var(--m); }
+.my-points { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 var(--s3); padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, var(--m) 10%, var(--surface)); }
+.my-points[hidden] { display: none; }
+.mp-label { font-size: 0.8125rem; font-weight: 700; color: var(--ink-2); margin-right: 4px; }
+.mp-item { display: inline-flex; flex-direction: column; align-items: center; }
+.mp-item .pt-img { height: 40px; width: auto; }
+.mp-item small { font-size: 0.625rem; color: var(--muted); }
+.badge-toast span { font-size: 0.8125rem; color: var(--muted); }
