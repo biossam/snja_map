@@ -1032,6 +1032,10 @@ a.ri-head:focus-visible, .ri-btn:focus-visible { outline: 3px solid var(--accent
 body:has(.live) main.wrap { max-width: min(1800px, 100%); }
 .live-main .sh-scroll { overflow-x: auto; max-width: 100%; }
 .live-summary { display: flex; flex-wrap: wrap; gap: var(--s4); margin-bottom: var(--s3); color: var(--ink-2); }
+.live-blocked { margin: 0 0 var(--s3); padding: var(--s3) var(--s4); border-radius: 12px; background: color-mix(in srgb, #f5a524 14%, var(--surface)); border: 1px solid color-mix(in srgb, #f5a524 45%, var(--line)); }
+.live-blocked p { margin: 0 0 4px; }
+.live-blocked-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.live-blocked-btns .btn-ghost { margin: 0; min-height: 34px; }
 .live-summary b { font-size: 1.5rem; color: var(--ink); }
 .live-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; background: var(--surface); }
 .live-table th, .live-table td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: left; white-space: nowrap; }

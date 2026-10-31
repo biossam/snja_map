@@ -1472,11 +1472,23 @@ async function liveCall(body) {
   // text/plain으로 보내 브라우저 사전 확인(CORS preflight) 없이 바로 보냄
   const res = await fetch(LIVE.url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) });
   const data = await res.json();
-  if (!data.ok) throw new Error(data.error || "서버 오류");
+  if (!data.ok) { const e = new Error(data.error || "서버 오류"); e.status = res.status; throw e; }
   if (data.config) LIVE.config = data.config;
   return data;
 }
 const ME_KEY = "snja-me-v1";
+// 이 기기 표시(무작위). 서버는 반·번호를 처음 쓴 기기에만 저장을 허락해 다른 학생인 척 덮어쓰기를 막음
+const DEV_KEY = "snja-dev-v1";
+let devMem = "";
+function deviceId() {
+  try { const v = localStorage.getItem(DEV_KEY); if (v && v.length >= 16) return v; } catch { /* 저장소 없음 */ }
+  if (!devMem) {
+    const a = new Uint8Array(18); crypto.getRandomValues(a);
+    devMem = Array.from(a, (b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  try { localStorage.setItem(DEV_KEY, devMem); } catch { /* 이 화면에서만 씀 */ }
+  return devMem;
+}
 const readJSON = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch { return {}; } };
 const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
 const slideSrc = (lesson, k) => `${lesson.slides.dir}/${k}.jpg`;
@@ -1826,7 +1838,7 @@ async function liveSync(lesson, submit = false) {
   try {
     liveChip("보내는 중…", true);
     const r = await liveCall({ action: "save", room: w.room, lesson: lesson.no, student: { ban: w.ban, no: w.no, group: w.group },
-      fields, gfields, progress: sheetProgress(lesson, st), submit,
+      dev: deviceId(), fields, gfields, progress: sheetProgress(lesson, st), submit,
       summary: submit ? sheetAnswers(lesson, st).map((x) => `${x.q}: ${x.a || "-"}`).join("\n") : undefined });
     LIVE.connected = true;
     if (r.gfields) applyGroup(lesson, r.gfields);
@@ -1835,6 +1847,12 @@ async function liveSync(lesson, submit = false) {
     if (submit) { alert("다 했어요! 선생님께 알렸어요."); earnSheetBadge(lesson); }
   } catch (err) {
     LIVE.connected = false;
+    if (err.status === 409) {
+      // 다른 기기에서 이미 쓰는 반·번호: 한 번만 크게 알림
+      liveChip("다른 기기에서 쓰는 번호예요", false);
+      if (submit || liveSync.warned !== `${w.room}/${w.ban}-${w.no}`) { liveSync.warned = `${w.room}/${w.ban}-${w.no}`; alert(err.message); }
+      return;
+    }
     liveChip("연결 안 됨", false);
     if (submit) alert(`선생님께 알리지 못했어요. ${err.message}\n그림으로 저장해 두세요.`);
   }
@@ -2134,6 +2152,7 @@ function renderLive(no) {
       <div class="live-grid">
         <div class="live-main">
           <div class="live-summary" data-summary></div>
+          <div class="live-blocked" data-blocked hidden></div>
           <div class="sh-scroll"><table class="live-table" data-table></table></div>
           <div class="live-groups" data-groups></div>
         </div>
@@ -2198,6 +2217,13 @@ function renderLive(no) {
     const active = list.filter((x) => (data.now - x.t) < 60000).length;
     app.querySelector("[data-summary]").innerHTML = `
       <span><b>${list.length}</b>명 들어옴</span><span><b>${active}</b>명 지금 쓰는 중</span><span><b>${subm}</b>명 다 했어요</span>`;
+    // 다른 기기에서 이미 쓰는 반·번호로 들어오려던 기록: 기기를 바꾼 학생이면 허락, 아니면 장난일 수 있음
+    const blocked = data.blocked ?? [];
+    const bx = app.querySelector("[data-blocked]");
+    bx.hidden = !blocked.length;
+    bx.innerHTML = blocked.length ? `<p><b>다른 기기에서 같은 번호로 들어오려 했어요:</b> ${blocked.map((sid) => esc(sid)).join(", ")}</p>
+      <p class="notes-help">기기를 바꾼 학생이면 허락해 주세요. 허락하면 그 번호는 다음에 저장하는 기기에서 쓰게 돼요. 모르는 경우면 그대로 두세요.</p>
+      <div class="live-blocked-btns">${blocked.map((sid) => `<button type="button" class="btn-ghost" data-unlock="${esc(sid)}">${esc(sid)} 새 기기 허락</button>`).join("")}</div>` : "";
     app.querySelector("[data-table]").innerHTML = list.length ? `
       <thead><tr><th>모둠</th><th>반-번호</th>${parts.map((p, pi) => `<th>${esc(p.title)}${groupParts().includes(pi) ? " <small>(모둠)</small>" : ""}</th>`).join("")}<th>마지막 입력</th><th>다 했어요</th>${pts.length ? "<th>칭찬포인트</th>" : ""}</tr></thead>
       <tbody>${list.map((x) => `<tr data-sid="${esc(x.sid)}" tabindex="0">
@@ -2297,6 +2323,12 @@ function renderLive(no) {
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     a.download = `${course.title}_${lesson.no}${LW()}_활동지_${cred().room}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
+  });
+  app.querySelector("[data-blocked]").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-unlock]"); if (!b) return;
+    const c = cred(); if (!c.room || !c.code) return;
+    if (!confirm(`${b.dataset.unlock} 학생이 새 기기에서 쓰도록 허락할까요?\n허락한 뒤 먼저 저장하는 기기로 바뀌니, 이전 기기는 닫게 해 주세요.`)) return;
+    try { await liveCall({ action: "unlock", room: c.room, teacher: c.code, sid: b.dataset.unlock }); load(); } catch (err) { alert(err.message); }
   });
   app.querySelector("[data-reset]").addEventListener("click", async () => {
     const c = cred(); if (!c.room || !c.code) return;
