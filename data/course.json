@@ -42,14 +42,20 @@
     "desc": "거래 나라를 바꿔 위기를 이겨 냄",
     "img": "assets/img/points/crisis.png",
     "id": "crisis",
-    "group": true
+    "group": true,
+    "lessons": [
+     6
+    ]
    },
    {
     "name": "도움 나라",
     "desc": "다른 나라가 만들도록 도움",
     "img": "assets/img/points/help.png",
     "id": "help",
-    "group": true
+    "group": true,
+    "lessons": [
+     6
+    ]
    }
   ],
   "license": {

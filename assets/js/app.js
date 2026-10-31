@@ -2142,7 +2142,8 @@ function renderLive(no) {
   };
   const ago = (t) => { const s = Math.max(0, Math.round(((data?.now ?? Date.now()) - t) / 1000)); return s < 60 ? `${s}초 전` : s < 3600 ? `${Math.floor(s / 60)}분 전` : `${Math.floor(s / 3600)}시간 전`; };
   const bar = ([d, n]) => `<span class="pbar" title="${d}/${n}"><i style="width:${n ? Math.round(d / n * 100) : 0}%"></i><b>${d}/${n}</b></span>`;
-  const pts = course.points ?? [];
+  // 이 차시에 줄 수 있는 칭찬포인트만 (예: 도움 나라·위기 극복은 6차시 게임에서만)
+  const pts = (course.points ?? []).filter((p) => !p.lessons || p.lessons.includes(lesson.no));
   const givenHere = (x) => (x.points ?? []).filter((g) => Number(g.lesson) === Number(lesson.no)).map((g) => g.point);
   const paint = () => {
     if (!data) return;
