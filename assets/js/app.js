@@ -560,6 +560,26 @@ function renderLesson(unitId, no, pick = 0) {
   const canClassMode = !isStudent && (lesson.slides?.count || lesson.videos?.length || lesson.steps?.length);
   const deck = slideViewer(lesson);
 
+  // 한 화면에 한 가지만: 수업 자료(PPT·영상) / 활동지 / 수업 안내 / 선생님 자료를 탭으로 나눔
+  const media = [
+    deck,
+    videos && !(deck && lesson.slides?.videos?.length) ? `<div class="videos">${videos}</div>` : deck ? "" : `<p class="empty-note">수업 영상은 준비 중입니다.</p>`,
+    artistSection(lesson),
+    figuresSection(lesson),
+    lesson.partsSheet && isStudent ? sheetHtml(lesson, { partsPanel: true }) : "",
+  ].join("");
+  const guide = [
+    details ? `<div class="details">${details}</div>` : "",
+    lesson.sheet ? "" : notesSection(unit, lesson),
+    strategySection(lesson),
+  ].join("");
+  const panes = [
+    { id: "media", label: lesson.slides?.count ? "PPT" : "영상", html: media },
+    { id: "sheet", label: "활동지", html: lesson.partsSheet ? "" : sheetHtml(lesson) },
+    { id: "guide", label: isStudent ? "활동 안내" : "수업 안내", html: guide },
+    { id: "teacher", label: "선생님 자료", html: isStudent ? "" : teacherSection(lesson) },
+  ].filter((x) => x.html && x.html.trim());
+
   app.innerHTML = `
     <nav class="crumb"><a href="${homeHref()}">${esc(course.title)}</a>${units.length > 1 ? ` <span>/</span> ${esc(unit.title)}` : ""}</nav>
     <header class="lesson-head">
@@ -576,24 +596,7 @@ function renderLesson(unitId, no, pick = 0) {
       ${canClassMode ? `<span class="head-actions"><button class="btn-primary" id="class-mode" type="button">${icon.screen}수업 모드</button>${lesson.sheet && !isStudent ? `<a class="btn-ghost" href="${homeHref()}/live/${lesson.no}" target="_blank" rel="noopener">실시간 현황</a>` : ""}</span>` : ""}
     </header>
 
-    ${deck}
-    ${videos && !(deck && lesson.slides?.videos?.length) ? `<div class="videos">${videos}</div>` : deck ? "" : `<p class="empty-note">수업 영상은 준비 중입니다.</p>`}
-
-    ${artistSection(lesson)}
-
-    ${figuresSection(lesson)}
-
-    ${lesson.partsSheet ? (isStudent ? sheetHtml(lesson, { partsPanel: true }) : "") : sheetHtml(lesson)}
-
-    ${details
-      ? `<div class="details">${details}</div>`
-      : `<p class="empty-note">이 ${LW()}의 활동 안내는 준비 중입니다.</p>`}
-
-    ${lesson.sheet ? "" : notesSection(unit, lesson)}
-
-    ${strategySection(lesson)}
-
-    ${teacherSection(lesson)}
+    ${lessonTabs(panes)}
 
     <nav class="pager">
       ${prev ? `<a href="${lessonHref(prev.unit, prev.lesson)}"><span>이전 ${LW()}</span>${esc(prev.lesson.title)}</a>` : "<span></span>"}
@@ -601,6 +604,7 @@ function renderLesson(unitId, no, pick = 0) {
     </nav>`;
 
   document.getElementById("class-mode")?.addEventListener("click", () => (lesson.slides?.count ? openSlideMode(lesson, 0) : openClassMode(lesson)));
+  bindLessonTabs();
   bindSlideViewer(lesson);
   bindSheet(lesson);
   document.title = `${lesson.no}${LW()} ${lesson.title} · ${course.title}`;
@@ -610,6 +614,41 @@ function renderLesson(unitId, no, pick = 0) {
   const picked = pick ? document.getElementById(`video-${pick}`) : null;
   if (picked) picked.scrollIntoView({ block: "start" });
   else window.scrollTo(0, 0);
+}
+
+/* ---------- 차시 화면 탭 ----------
+   고른 탭은 이 탭(브라우저 창)에서 기억해, 다음 차시로 가도 같은 탭이 열림.
+   학생은 처음에 활동지 탭부터 보여 줌. */
+const TAB_KEY = "snja-lesson-tab";
+function lessonTabs(panes) {
+  if (!panes.length) return `<p class="empty-note">이 ${LW()}의 내용은 준비 중입니다.</p>`;
+  if (panes.length === 1) return `<div class="lesson-pane is-only">${panes[0].html}</div>`;
+  let want = ""; try { want = sessionStorage.getItem(TAB_KEY) || ""; } catch { /* 없음 */ }
+  if (!panes.some((p) => p.id === want)) want = isStudent && panes.some((p) => p.id === "sheet") ? "sheet" : panes[0].id;
+  return `
+    <div class="lesson-tabs" role="tablist" aria-label="차시 내용">
+      ${panes.map((p) => `<button type="button" role="tab" id="tab-${p.id}" aria-controls="pane-${p.id}" aria-selected="${p.id === want}" data-tab="${p.id}">${esc(p.label)}</button>`).join("")}
+    </div>
+    ${panes.map((p) => `<section class="lesson-pane" role="tabpanel" id="pane-${p.id}" aria-labelledby="tab-${p.id}"${p.id === want ? "" : " hidden"}>${p.html}</section>`).join("")}`;
+}
+function bindLessonTabs() {
+  const bar = document.querySelector(".lesson-tabs");
+  if (!bar) return;
+  const pick = (id, focus) => {
+    bar.querySelectorAll("[data-tab]").forEach((b) => { const on = b.dataset.tab === id; b.setAttribute("aria-selected", String(on)); if (on && focus) b.focus(); });
+    document.querySelectorAll(".lesson-pane").forEach((p) => { p.hidden = p.id !== `pane-${id}`; });
+    try { sessionStorage.setItem(TAB_KEY, id); } catch { /* 기억 못 해도 됨 */ }
+    window.dispatchEvent(new Event("resize"));   // 숨겨져 있던 슬라이드·표가 크기를 다시 잡게
+    const top = bar.getBoundingClientRect().top + window.scrollY - 8;
+    if (window.scrollY > top) window.scrollTo({ top });
+  };
+  bar.addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (b) pick(b.dataset.tab); });
+  bar.addEventListener("keydown", (e) => {
+    if (!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+    const tabs = [...bar.querySelectorAll("[data-tab]")];
+    const i = tabs.findIndex((b) => b.getAttribute("aria-selected") === "true");
+    pick(tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length].dataset.tab, true);
+  });
 }
 
 /* ---------- 파트별로 보고 활동하기 ----------
@@ -2162,7 +2201,7 @@ function renderLive(no) {
       </div>
       <nav class="live-lessons" aria-label="차시">${lessons.map(({ unit, lesson: l }) =>
         `<a href="${homeHref()}/live/${l.no}"${l === lesson ? ` aria-current="page"` : ""}>${l.no}${LW()}<small>${esc(l.title)}</small></a>`).join("")}</nav>
-      <div class="live-grid">
+      <div class="live-grid"${saved.room && saved.code ? "" : " hidden"}>
         <div class="live-main">
           <div class="live-summary" data-summary></div>
           <div class="live-blocked" data-blocked hidden></div>
@@ -2172,20 +2211,23 @@ function renderLive(no) {
         <aside class="live-side">
           <section class="live-box">
             <h2>학생 들어오는 곳</h2>
-            <div class="live-qr" data-qr></div>
-            <p class="qr-url" data-url></p>
             <button class="btn-primary" type="button" data-share>교실 링크로 학생에게 보내기</button>
-            <p class="notes-help">학생은 반·번호·모둠만 쓰면 바로 연결돼요. 이름은 보내지 않아요.</p>
+            <details class="live-fold"><summary>QR·주소 보기</summary>
+              <div class="live-qr" data-qr></div>
+              <p class="qr-url" data-url></p>
+            </details>
           </section>
           <section class="live-box">
-            <h2>모둠 활동 칸 설정</h2>
-            <p class="notes-help">모둠으로 바꾼 칸은 같은 모둠 학생끼리 함께 쓰고, 서로 쓴 내용이 몇 초 뒤 보여요.</p>
-            <ul class="live-parts" data-parts></ul>
+            <h2>기록</h2>
+            <button class="btn-primary" type="button" data-csv>${icon.download}CSV로 받기</button>
+            <button class="btn-ghost" type="button" data-reset>이 ${LW()} 기록 비우기</button>
+            <p class="notes-help">수업을 종료하면 기록도 지워져요. 끝내기 전에 받아 두세요.</p>
           </section>
           <section class="live-box">
-            <button class="btn-primary" type="button" data-csv>${icon.download}이 차시 기록 CSV로 받기</button>
-            <p class="notes-help">교실 링크에서 수업을 종료하면 활동지 기록도 함께 지워져요. 끝내기 전에 받아 두세요.</p>
-            <button class="btn-ghost" type="button" data-reset>이 차시 실시간 기록 비우기</button>
+            <details class="live-fold"><summary>모둠 활동 칸 설정</summary>
+              <p class="notes-help">모둠으로 바꾼 칸은 같은 모둠 학생끼리 함께 써요.</p>
+              <ul class="live-parts" data-parts></ul>
+            </details>
           </section>
         </aside>
       </div>
@@ -2245,7 +2287,7 @@ function renderLive(no) {
         <td class="${(data.now - x.t) < 60000 ? "is-live" : ""}">${ago(x.t)}</td>
         <td>${x.submitted ? `<span class="ok">✓</span>` : ""}</td>
         ${pts.length ? `<td class="pt-cell">${givenHere(x).map((g) => pointImg(pointById(g), "pt-mini")).join("")}${(() => { const rec = recommendPoints(lesson, x.fields || {}).filter((id) => !givenHere(x).includes(id)); return rec.length ? `<span class="pt-rec">추천 ${rec.length}</span>` : ""; })()}</td>` : ""}</tr>`).join("")}</tbody>`
-      : `<caption class="status">아직 들어온 학생이 없어요. 오른쪽 주소나 QR로 학생 화면을 열게 해 주세요.</caption>`;
+      : `<caption class="status">아직 들어온 학생이 없어요. 오른쪽 [교실 링크로 학생에게 보내기]를 눌러 주세요.</caption>`;
     const groups = Object.keys(data.groups ?? {}).sort((a, b) => Number(a) - Number(b));
     const gp = groupParts();
     app.querySelector("[data-groups]").innerHTML = (gp.length || pts.some((p) => p.group)) && groups.length ? `
@@ -2273,7 +2315,8 @@ function renderLive(no) {
       <dl>${sheetAnswers(lesson, x.fields || {}).map((a) => `<dt>${esc(a.q)}</dt><dd>${esc(a.a || "—")}</dd>`).join("")}</dl>`;
     d.showModal?.();
   };
-  const paintStart = () => { const c = cred(); app.querySelector("[data-start]").hidden = Boolean(c.room && c.code); };
+  // 연결 전에는 [교실 링크에서 수업 열기]만, 연결되면 현황 표와 오른쪽 도구만 보여 줌
+  const paintStart = () => { const c = cred(); const on = Boolean(c.room && c.code); app.querySelector("[data-start]").hidden = on; app.querySelector(".live-grid").hidden = !on; };
   const load = async () => {
     const c = cred(); if (!c.room || !c.code) return;
     try {

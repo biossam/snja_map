@@ -1133,3 +1133,44 @@ body:has(.live) main.wrap { max-width: min(1800px, 100%); }
 .mp-item .pt-img { height: 40px; width: auto; }
 .mp-item small { font-size: 0.625rem; color: var(--muted); }
 .badge-toast span { font-size: 0.8125rem; color: var(--muted); }
+
+/* ---------- 차시 화면 탭: 한 화면에 한 가지만 ---------- */
+.lesson-tabs { position: sticky; top: 0; z-index: 6; display: flex; gap: 6px; flex-wrap: wrap; margin: var(--s5) 0 var(--s5); padding: 10px 0; background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+.lesson-tabs button { min-height: 40px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: inherit; font-weight: 700; font-size: 0.9375rem; cursor: pointer; transition: background .15s var(--ease), color .15s var(--ease); }
+.lesson-tabs button:hover { border-color: var(--accent); color: var(--ink); }
+.lesson-tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.lesson-pane[hidden] { display: none !important; }
+.lesson-pane > :first-child { margin-top: 0; }
+
+/* 차시 머리: 넓은 화면에서는 제목 옆에 학습 목표·버튼을 두어 첫 화면에 탭까지 보이게 */
+@media (min-width: 900px) {
+  .lesson-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem); column-gap: var(--s6); align-items: center; padding: var(--s5) 0 var(--s3); }
+  .lesson-head .lesson-title { grid-column: 1; grid-row: 1 / span 2; }
+  .lesson-head .goal { grid-column: 2; margin: 0; padding: var(--s3) var(--s4); border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font-size: 0.9375rem; }
+  .lesson-head .head-actions { grid-column: 2; margin-top: var(--s3); display: flex; flex-wrap: wrap; gap: var(--s2); }
+  .lesson-head .head-actions > * { margin: 0; }
+  .lesson-head .badge-note { margin-bottom: 0; }
+}
+
+/* PPT: 넓은 화면에서는 슬라이드를 화면 높이에 맞추고, 썸네일·메모는 오른쪽 세로 줄로 */
+@media (min-width: 1100px) {
+  .lesson-pane .deck { display: grid; grid-template-columns: minmax(0, 1fr) 13rem; grid-template-areas: "stage thumbs" "vids thumbs" "bar thumbs" "notes thumbs"; column-gap: var(--s4); align-items: start; margin-top: 0; }
+  .lesson-pane .deck-stage { grid-area: stage; max-width: calc((100vh - 230px) * 16 / 9); width: 100%; justify-self: center; }
+  .lesson-pane .deck-vids { grid-area: vids; }
+  .lesson-pane .deck-bar { grid-area: bar; }
+  .lesson-pane .deck-notes { grid-area: notes; }
+  .lesson-pane .deck-thumbs { grid-area: thumbs; flex-direction: column; overflow-x: hidden; overflow-y: auto; max-height: calc(100vh - 150px); margin: 0; padding: 2px 6px 2px 2px; }
+  .lesson-pane .deck-thumbs img { width: 100%; }
+}
+@media (min-width: 900px) {
+  .lesson-head .lesson-badge { width: 96px; }
+  .lesson-head h1 { font-size: clamp(2.5rem, 4.4vw, 3.25rem); }
+  .lesson-tabs { margin-top: var(--s4); }
+}
+.live-fold summary { cursor: pointer; font-weight: 700; font-size: 0.9375rem; color: var(--ink-2); }
+.live-box > .live-fold:only-child summary { color: var(--ink); }
+.live-fold[open] summary { margin-bottom: var(--s2); }
+.live-box .live-fold { margin-top: var(--s3); }
+.live-box > .live-fold:only-child { margin-top: 0; }
+.live-side { position: sticky; top: var(--s4); }
+.live-grid[hidden] { display: none !important; }
