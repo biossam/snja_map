@@ -1356,7 +1356,7 @@ async function route() {
   const hk = hash.match(/^(#[^&]*)&(.*)$/);
   if (hk) {
     const q = new URLSearchParams(hk[2]);
-    if (q.get("room") && q.get("key") && !isStudent) writeJSON(LIVE_T_KEY, { room: q.get("room").toUpperCase(), code: q.get("key") });
+    if (q.get("room") && q.get("key") && !isStudent) writeT({ room: q.get("room").toUpperCase(), code: q.get("key") });
     hash = hk[1];
     history.replaceState(null, "", `${location.pathname}${location.search}${hash}`);
   }
@@ -1467,6 +1467,10 @@ const SHEET_KEY = "snja-sheet-v1";
 // 실시간 수업 서버 (site.json의 site.live.url). 비어 있으면 실시간 기능 없이 기기에만 저장
 const LIVE = { url: "", config: {}, connected: false };
 const LIVE_T_KEY = "snja-live-teacher-v1";
+// 선생님 키는 이 탭에서만 기억(sessionStorage): 탭을 닫으면 지워져서 다음 수업·다른 사람에게 남지 않음
+try { localStorage.removeItem(LIVE_T_KEY); } catch { /* 예전 버전이 남긴 키 지우기 */ }
+const readT = () => { try { return JSON.parse(sessionStorage.getItem(LIVE_T_KEY) || "{}") || {}; } catch { return {}; } };
+const writeT = (v) => { try { v ? sessionStorage.setItem(LIVE_T_KEY, JSON.stringify(v)) : sessionStorage.removeItem(LIVE_T_KEY); } catch { /* 이 화면에서만 */ } };
 async function liveCall(body) {
   if (!LIVE.url) throw new Error("실시간 수업 서버가 아직 연결되지 않았어요");
   // text/plain으로 보내 브라우저 사전 확인(CORS preflight) 없이 바로 보냄
@@ -2117,7 +2121,7 @@ function renderLive(no) {
   const cur = lessons.find(({ lesson }) => String(lesson.no) === String(no)) ?? lessons[0];
   if (!cur) { app.innerHTML = `<p class="status">활동지가 있는 차시가 없어요.</p>`; return; }
   const { lesson } = cur;
-  const saved = readJSON(LIVE_T_KEY);
+  const saved = readT();
   const studentUrl = (room) => `${location.origin}${location.pathname}?view=student${room ? `&room=${encodeURIComponent(room)}` : ""}${homeHref()}/lesson/${encodeURIComponent(cur.unit.id)}/${lesson.no}`;
 
   if (!LIVE.url) {
@@ -2142,11 +2146,12 @@ function renderLive(no) {
         <h1>실시간 현황</h1>
         <form class="live-login" autocomplete="off">
           <label>참여 코드 <input name="room" value="${esc(saved.room ?? "")}" required maxlength="6" placeholder="교실 링크 6자리"></label>
-          <label>선생님 키 <input name="code" type="password" value="${esc(saved.code ?? "")}" required title="교실 링크 교사 화면의 '실시간 현황' 버튼으로 열면 자동으로 들어가요"></label>
+          <label>선생님 키 <input name="code" type="password" value="${esc(saved.code ?? "")}" required placeholder="자동으로 들어가요" title="교실 링크 교사 화면의 '실시간 현황' 버튼으로 열면 자동으로 들어가요"></label>
           <button class="btn-primary" type="submit">연결</button>
           <span class="live-chip" data-dash-chip>연결 전</span>
         </form>
       </header>
+      <p class="notes-help live-keyhelp">교실 링크의 <b>성장 MAP 활동지</b> 탭에서 <b>[실시간 현황]</b>을 누르면 코드와 키가 저절로 들어가요. 선생님 키는 교사 PIN이 아니에요. 이 탭을 닫으면 키는 지워져요.</p>
       <nav class="live-lessons" aria-label="차시">${lessons.map(({ unit, lesson: l }) =>
         `<a href="${homeHref()}/live/${l.no}"${l === lesson ? ` aria-current="page"` : ""}>${l.no}${LW()}<small>${esc(l.title)}</small></a>`).join("")}</nav>
       <div class="live-grid">
@@ -2183,7 +2188,7 @@ function renderLive(no) {
   const form = app.querySelector(".live-login");
   const chip = app.querySelector("[data-dash-chip]");
   let data = null, timer = null;
-  const cred = () => readJSON(LIVE_T_KEY);
+  const cred = () => readT();
 
   const paintLink = () => {
     const url = studentUrl(cred().room);
@@ -2266,12 +2271,21 @@ function renderLive(no) {
       data = await liveCall({ action: "dash", room: c.room, teacher: c.code, lesson: lesson.no });
       chip.textContent = "실시간 ●"; chip.classList.add("is-on");
       paint(); paintParts();
-    } catch (err) { chip.textContent = err.message; chip.classList.remove("is-on"); }
+    } catch (err) {
+      chip.textContent = err.message; chip.classList.remove("is-on");
+      // 끝난 수업이거나 키가 틀리면 기억한 코드·키를 지워 다음에 엉뚱하게 채워지지 않게 함
+      if (err.status === 403 || err.status === 404) {
+        writeT(null);
+        form.elements.code.value = "";
+        if (err.status === 404) form.elements.room.value = "";
+        chip.textContent = err.status === 404 ? "끝난 수업이에요. 교실 링크에서 다시 열어 주세요." : "선생님 키가 맞지 않아요. 교실 링크에서 다시 열어 주세요.";
+      }
+    }
   };
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const f = new FormData(form);
-    writeJSON(LIVE_T_KEY, { room: String(f.get("room")).replace(/[^0-9A-Za-z]/g, "").slice(0, 6).toUpperCase(), code: String(f.get("code")).trim() });
+    writeT({ room: String(f.get("room")).replace(/[^0-9A-Za-z]/g, "").slice(0, 6).toUpperCase(), code: String(f.get("code")).trim() });
     paintLink(); load();
   });
   app.querySelector("[data-parts]").addEventListener("click", async (e) => {
