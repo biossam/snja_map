@@ -2122,6 +2122,8 @@ function renderLive(no) {
   if (!cur) { app.innerHTML = `<p class="status">활동지가 있는 차시가 없어요.</p>`; return; }
   const { lesson } = cur;
   const saved = readT();
+  // 교실 링크 첫 화면으로 보내면서 이 교재·차시를 알려 줌(교실 링크가 수업을 연 뒤 그 차시를 바로 보여 줌)
+  const classLinkUrl = `${new URL(LIVE.url || "https://classroom-link.onrender.com").origin}/?snja=${encodeURIComponent(cid)}&lesson=${lesson.no}`;
   const studentUrl = (room) => `${location.origin}${location.pathname}?view=student${room ? `&room=${encodeURIComponent(room)}` : ""}${homeHref()}/lesson/${encodeURIComponent(cur.unit.id)}/${lesson.no}`;
 
   if (!LIVE.url) {
@@ -2144,14 +2146,20 @@ function renderLive(no) {
     <section class="live">
       <header class="live-head">
         <h1>실시간 현황</h1>
-        <form class="live-login" autocomplete="off">
-          <label>참여 코드 <input name="room" value="${esc(saved.room ?? "")}" required maxlength="6" placeholder="교실 링크 6자리"></label>
-          <label>선생님 키 <input name="code" type="password" value="${esc(saved.code ?? "")}" required placeholder="자동으로 들어가요" title="교실 링크 교사 화면의 '실시간 현황' 버튼으로 열면 자동으로 들어가요"></label>
-          <button class="btn-primary" type="submit">연결</button>
-          <span class="live-chip" data-dash-chip>연결 전</span>
-        </form>
+        <span class="live-chip" data-dash-chip>연결 전</span>
       </header>
-      <p class="notes-help live-keyhelp">교실 링크의 <b>성장 MAP 활동지</b> 탭에서 <b>[실시간 현황]</b>을 누르면 코드와 키가 저절로 들어가요. 선생님 키는 교사 PIN이 아니에요. 이 탭을 닫으면 키는 지워져요.</p>
+      <div class="live-start" data-start${saved.room && saved.code ? " hidden" : ""}>
+        <a class="btn-primary live-open" href="${esc(classLinkUrl)}" target="_blank" rel="noopener">${icon.external}교실 링크에서 수업 열기</a>
+        <p class="notes-help">교실 링크에서 수업을 열면(이미 열려 있으면 이어서) <b>${esc(course.title)} ${lesson.no}${LW()}</b>가 바로 보여요. 거기서 <b>[학생에게 보내기]</b>와 <b>[실시간 현황]</b>을 누르면 코드와 키가 저절로 들어간 새 현황 화면이 열려요. 교사 PIN은 교실 링크에만 넣어요.</p>
+        <details class="live-manual"><summary>참여 코드·선생님 키 직접 입력</summary>
+          <form class="live-login" autocomplete="off">
+            <label>참여 코드 <input name="room" value="${esc(saved.room ?? "")}" required maxlength="6" placeholder="교실 링크 6자리"></label>
+            <label>선생님 키 <input name="code" type="password" value="${esc(saved.code ?? "")}" required title="교사 PIN이 아니에요. 교실 링크 교사 화면에서 열면 자동으로 들어가요"></label>
+            <button class="btn-primary" type="submit">연결</button>
+          </form>
+          <p class="notes-help">선생님 키는 교사 PIN이 아니에요. 이 탭을 닫으면 키는 지워져요.</p>
+        </details>
+      </div>
       <nav class="live-lessons" aria-label="차시">${lessons.map(({ unit, lesson: l }) =>
         `<a href="${homeHref()}/live/${l.no}"${l === lesson ? ` aria-current="page"` : ""}>${l.no}${LW()}<small>${esc(l.title)}</small></a>`).join("")}</nav>
       <div class="live-grid">
@@ -2265,17 +2273,18 @@ function renderLive(no) {
       <dl>${sheetAnswers(lesson, x.fields || {}).map((a) => `<dt>${esc(a.q)}</dt><dd>${esc(a.a || "—")}</dd>`).join("")}</dl>`;
     d.showModal?.();
   };
+  const paintStart = () => { const c = cred(); app.querySelector("[data-start]").hidden = Boolean(c.room && c.code); };
   const load = async () => {
     const c = cred(); if (!c.room || !c.code) return;
     try {
       data = await liveCall({ action: "dash", room: c.room, teacher: c.code, lesson: lesson.no });
-      chip.textContent = "실시간 ●"; chip.classList.add("is-on");
+      chip.textContent = "실시간 ●"; chip.classList.add("is-on"); paintStart();
       paint(); paintParts();
     } catch (err) {
       chip.textContent = err.message; chip.classList.remove("is-on");
       // 끝난 수업이거나 키가 틀리면 기억한 코드·키를 지워 다음에 엉뚱하게 채워지지 않게 함
       if (err.status === 403 || err.status === 404) {
-        writeT(null);
+        writeT(null); paintStart();
         form.elements.code.value = "";
         if (err.status === 404) form.elements.room.value = "";
         chip.textContent = err.status === 404 ? "끝난 수업이에요. 교실 링크에서 다시 열어 주세요." : "선생님 키가 맞지 않아요. 교실 링크에서 다시 열어 주세요.";
