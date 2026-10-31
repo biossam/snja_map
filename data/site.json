@@ -13,6 +13,12 @@
       "grade": 6,
       "title": "국가 간 무역",
       "file": "data/course.json"
+    },
+    {
+      "id": "humanskill",
+      "grade": 6,
+      "title": "휴먼스킬아트",
+      "file": "data/courses/humanskill.json"
     }
   ]
 }

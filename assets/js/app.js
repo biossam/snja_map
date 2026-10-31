@@ -101,7 +101,7 @@ function lessonStatus(lesson) {
   const f = teacherFileCount(lesson);
   const parts = [];
   const np = (lesson.videos ?? []).reduce((n, x) => n + (x.parts?.length ?? 0), 0);
-  if (lesson.slides?.count) parts.push(`PPT ${lesson.slides.count}장`);
+  if (lesson.slides?.count && !(isStudent && course.slidesTeacherOnly)) parts.push(`PPT ${lesson.slides.count}장`);
   if (lesson.sheet?.parts?.length) parts.push("활동지");
   if (np) parts.push(`파트 ${np}개`);
   else if (v) parts.push(`영상 ${v}개`);
@@ -353,7 +353,7 @@ function renderHome() {
                 ${lesson.stage ? `<span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}
                 <span class="step-status">${esc(lessonStatus(lesson))}</span>
               </span>
-              ${thumbId ? `<img class="step-thumb" src="${thumbOf(vids[0])}" alt="" loading="lazy">` : lesson.slides?.count ? `<img class="step-thumb is-slide" src="${esc(slideSrc(lesson, 1))}" alt="" loading="lazy">` : ""}
+              ${thumbId ? `<img class="step-thumb" src="${thumbOf(vids[0])}" alt="" loading="lazy">` : slidesVisible(lesson) ? `<img class="step-thumb is-slide" src="${esc(slideSrc(lesson, 1))}" alt="" loading="lazy">` : ""}
             </a>${strip}
           </li>`;
         }).join("")}
@@ -575,7 +575,7 @@ function renderLesson(unitId, no, pick = 0) {
     </header>
 
     ${deck}
-    ${videos ? `<div class="videos">${videos}</div>` : deck ? "" : `<p class="empty-note">수업 영상은 준비 중입니다.</p>`}
+    ${videos && !(deck && lesson.slides?.videos?.length) ? `<div class="videos">${videos}</div>` : deck ? "" : `<p class="empty-note">수업 영상은 준비 중입니다.</p>`}
 
     ${artistSection(lesson)}
 
@@ -1473,9 +1473,14 @@ const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); 
 const slideSrc = (lesson, k) => `${lesson.slides.dir}/${k}.jpg`;
 
 /* ---------- PPT 슬라이드 보기 (차시 화면) ---------- */
+const slidesVisible = (lesson) => Boolean(lesson.slides?.count) && !(isStudent && course.slidesTeacherOnly);
+// 이 슬라이드에서 틀 영상 목록 (lesson.slides.videos: [{slide, youtubeId, title, start}])
+const slideVideos = (lesson, n) => (lesson.slides?.videos ?? []).filter((v) => Number(v.slide) === n && String(v.youtubeId ?? "").trim());
+const ytEmbed = (v, autoplay = true) => `https://www.youtube-nocookie.com/embed/${encodeURIComponent(String(v.youtubeId).trim())}?rel=0${autoplay ? "&autoplay=1" : ""}${v.start ? `&start=${Number(v.start) || 0}` : ""}`;
+
 function slideViewer(lesson) {
   const s = lesson.slides;
-  if (!s?.count) return "";
+  if (!slidesVisible(lesson)) return "";
   const thumbs = Array.from({ length: s.count }, (_, i) => `
     <li><button type="button" data-go="${i}" aria-label="${i + 1}번 슬라이드${s.titles?.[i] ? `: ${esc(s.titles[i])}` : ""}">
       <img src="${esc(slideSrc(lesson, i + 1))}" alt="" loading="lazy" width="160" height="90"><span>${i + 1}</span></button></li>`).join("");
@@ -1486,6 +1491,7 @@ function slideViewer(lesson) {
         <button type="button" class="deck-nav prev" data-move="-1" aria-label="이전 슬라이드">${icon.left}</button>
         <button type="button" class="deck-nav next" data-move="1" aria-label="다음 슬라이드">${icon.right}</button>
       </div>
+      <div class="deck-vids" hidden></div>
       <div class="deck-bar">
         <span class="deck-count" aria-live="polite">1 / ${s.count}</span>
         <span class="deck-title"></span>
@@ -1502,8 +1508,15 @@ function bindSlideViewer(lesson) {
   const s = lesson.slides;
   let cur = 0;
   const img = root.querySelector(".deck-img");
+  const stage = root.querySelector(".deck-stage");
+  const vbox = root.querySelector(".deck-vids");
+  const closeVideo = () => { stage.querySelector(".deck-video")?.remove(); img.hidden = false; };
   const show = (i) => {
     cur = Math.max(0, Math.min(s.count - 1, i));
+    closeVideo();
+    const vids = slideVideos(lesson, cur + 1);
+    vbox.hidden = !vids.length;
+    vbox.innerHTML = vids.map((v, k) => `<button type="button" class="deck-vid" data-vid="${k}">${icon.screen}<span>이 슬라이드 영상 · <b>${esc(v.title)}</b></span></button>`).join("");
     img.src = slideSrc(lesson, cur + 1);
     img.alt = s.titles?.[cur] || `${cur + 1}번 슬라이드`;
     root.querySelector(".deck-count").textContent = `${cur + 1} / ${s.count}`;
@@ -1520,6 +1533,15 @@ function bindSlideViewer(lesson) {
     document.querySelectorAll(".sheet-part").forEach((p) => p.classList.toggle("is-now", (JSON.parse(p.dataset.slides || "[]")).includes(cur + 1)));
   };
   root.addEventListener("click", (e) => {
+    const pv = e.target.closest("[data-vid]");
+    if (pv) {
+      const v = slideVideos(lesson, cur + 1)[Number(pv.dataset.vid)]; if (!v) return;
+      closeVideo(); img.hidden = true;
+      stage.insertAdjacentHTML("afterbegin", `<div class="deck-video"><iframe src="${esc(ytEmbed(v))}" title="${esc(v.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        <button type="button" class="deck-video-close" aria-label="영상 닫고 슬라이드 보기">${icon.close}</button></div>`);
+      return;
+    }
+    if (e.target.closest(".deck-video-close")) return closeVideo();
     const m = e.target.closest("[data-move]"); if (m) return show(cur + Number(m.dataset.move));
     const g = e.target.closest("[data-go]"); if (g) return show(Number(g.dataset.go));
     if (e.target.closest(".deck-from")) openSlideMode(lesson, cur);
@@ -1926,6 +1948,7 @@ function openSlideMode(lesson, start = 0) {
     <div class="sm-top">
       <p><span>${lesson.no}${LW()}</span> ${esc(lesson.title)}</p>
       <span class="sm-tools">
+        <button type="button" class="sm-btn sm-video" hidden></button>
         ${lesson.sheet ? `<button type="button" class="sm-btn sm-sheet">활동지</button>` : ""}
         <a class="sm-btn sm-live" href="${homeHref()}/live/${lesson.no}" target="_blank" rel="noopener">실시간 현황</a>
         <button type="button" class="sm-btn sm-notes" aria-pressed="false">메모</button>
@@ -1936,6 +1959,7 @@ function openSlideMode(lesson, start = 0) {
     <div class="sm-body">
       <div class="sm-slide"><img alt="" width="1280" height="720"></div>
       <div class="sm-sheet-view" hidden></div>
+      <div class="sm-video-view" hidden></div>
     </div>
     <div class="sm-note" hidden></div>
     <div class="cm-nav">
@@ -1953,7 +1977,15 @@ function openSlideMode(lesson, start = 0) {
   const paint = () => {
     img.src = slideSrc(lesson, cur + 1); img.alt = s.titles?.[cur] || `${cur + 1}번 슬라이드`;
     pre(cur + 2);
-    overlay.querySelector(".cm-count").textContent = view === "slide" ? `${cur + 1} / ${s.count}` : "활동지";
+    overlay.querySelector(".cm-count").textContent = view === "slide" ? `${cur + 1} / ${s.count}` : view === "video" ? "영상" : "활동지";
+    const vids = slideVideos(lesson, cur + 1);
+    const vb = overlay.querySelector(".sm-video");
+    vb.hidden = !vids.length && view !== "video";
+    vb.textContent = view === "video" ? "PPT로 돌아가기" : vids.length ? `▶ 영상: ${vids[0].title}` : "";
+    vb.classList.toggle("is-hot", vids.length > 0 && view === "slide");
+    const vv = overlay.querySelector(".sm-video-view");
+    vv.hidden = view !== "video";
+    if (view !== "video") vv.innerHTML = "";
     const here = partsAt(cur + 1);
     const btn = overlay.querySelector(".sm-sheet");
     if (btn) {
@@ -1961,6 +1993,7 @@ function openSlideMode(lesson, start = 0) {
       btn.textContent = view === "sheet" ? "PPT로 돌아가기" : here.length ? `활동지: ${here[0].p.title}` : "활동지";
     }
     overlay.querySelector(".sm-slide").hidden = view !== "slide";
+    if (view === "video" && !vv.innerHTML && vids[0]) vv.innerHTML = `<iframe src="${esc(ytEmbed(vids[0]))}" title="${esc(vids[0].title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
     sheetView.hidden = view !== "sheet";
     const nt = overlay.querySelector(".sm-note");
     nt.hidden = !notes || view !== "slide"; nt.textContent = s.notes?.[cur] || "메모 없음";
@@ -1975,7 +2008,7 @@ function openSlideMode(lesson, start = 0) {
     if (target) target.scrollIntoView({ block: "start" }); else sheetView.scrollTop = 0;
   };
   const move = (d) => {
-    if (view === "sheet") { view = "slide"; paint(); return; }
+    if (view === "sheet" || view === "video") { view = "slide"; paint(); return; }
     cur = Math.max(0, Math.min(s.count - 1, cur + d)); paint();
   };
   const close = () => {
@@ -1998,6 +2031,7 @@ function openSlideMode(lesson, start = 0) {
     const m = e.target.closest("[data-move]"); if (m) return move(Number(m.dataset.move));
     if (e.target.closest(".cm-close")) return close();
     if (e.target.closest(".sm-sheet")) return view === "sheet" ? (view = "slide", paint()) : openSheet();
+    if (e.target.closest(".sm-video")) { view = view === "video" ? "slide" : "video"; return paint(); }
     if (e.target.closest(".sm-notes")) { notes = !notes; e.target.closest(".sm-notes").setAttribute("aria-pressed", String(notes)); return paint(); }
     if (e.target.closest(".sm-full")) { document.fullscreenElement ? document.exitFullscreen?.() : overlay.requestFullscreen?.().catch(() => {}); return; }
     // 슬라이드 오른쪽/왼쪽을 누르면 넘김
