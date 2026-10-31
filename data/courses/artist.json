@@ -1,648 +1,652 @@
 {
-  "course": {
-    "title": "어느 날 눈떠보니 예술가가 되었다",
-    "tagline": "2025 경기온라인학교 · 공공미술 편",
-    "subject": "미술",
-    "grade": "초등 6학년",
-    "author": "장혜림",
-    "credits": [
-      "수업 영상: 경기온라인학교 × 경기도공공미술교육연구회 (기획 장혜림)",
-      "사이트용 편집본은 얼굴이 나오는 장면을 수업 자료 화면으로 바꾸고 목소리와 자막은 그대로 두었습니다.",
-      "차시 배지: Google Gemini로 생성한 이미지"
-    ],
-    "lessonWord": "편",
-    "noWorksheet": true,
-    "teacherLinks": [
-      {
-        "title": "🖼️ 우리 반 전시회 만들기 (선생님용)",
-        "url": "https://biossam.github.io/public_art/?teacher=1#gallery"
-      }
-    ]
-  },
-  "units": [
-    {
-      "id": "publicart",
-      "title": "공공미술 편",
-      "lessons": [
-        {
-          "no": 1,
-          "title": "길 위의 예술, 나도 함께라구요?",
-          "badge": "assets/img/badges/artist/1.png",
-          "topic": "공공미술가 · 일상 공간에서 예술 찾기",
-          "goal": "우리 주변 공간에 놓인 공공미술을 알아보고, 학교 공간에 어울리는 작품을 만들어 설치할 수 있다.",
-          "materials": [
-            "마스킹 테이프(색 테이프)",
-            "태블릿"
-          ],
-          "videos": [
-            {
-              "youtubeId": "DYJX4PTH7ik",
-              "title": "공공미술가 편",
-              "parts": [
-                {
-                  "title": "들어가기",
-                  "start": 0,
-                  "end": 31,
-                  "summary": "오늘은 일상 공간에서 예술을 찾아봐요."
-                },
-                {
-                  "title": "예술이 왜 여기서 나와?",
-                  "start": 31,
-                  "end": 95.5,
-                  "summary": "7층 건물 꼭대기에 놓인 작은 집, 서도호의 「Fallen Star」를 만나요.",
-                  "links": [
-                    {
-                      "title": "Do Ho Suh: Fallen Star (1:30~2:01)",
-                      "channel": "University of California Television (UCTV)",
-                      "url": "https://www.youtube.com/watch?v=bG_y5mZga08&t=90s"
-                    }
-                  ],
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "건물 꼭대기에 집이 놓여 있는 걸 처음 보면 어떤 기분이 들까요?",
-                        "이 작품이 미술관 안에 있었다면 무엇이 달라졌을까요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "이게 대체 무슨 뜻이지?",
-                  "start": 95.5,
-                  "end": 129,
-                  "summary": "미술관 밖, 여러 사람이 함께 보고 느끼는 예술을 '공공미술'이라고 해요.",
-                  "activity": [
-                    {
-                      "type": "quiz",
-                      "q": "공공미술에 대한 설명으로 알맞은 것은?",
-                      "options": [
-                        "미술관 안에서만 볼 수 있는 작품",
-                        "우리 주변의 여러 사람이 함께 보고 느끼는 예술",
-                        "작가 혼자 간직하는 작품"
-                      ],
-                      "answer": 1,
-                      "explain": "벽화, 조형물, 바닥 그림처럼 우리 주변 공간에 놓여 누구나 함께 볼 수 있는 예술이 공공미술이에요."
-                    }
-                  ]
-                },
-                {
-                  "title": "진짜로 있었던 이야기라고?",
-                  "start": 129,
-                  "end": 215,
-                  "summary": "인천국제공항 제2터미널에서 열린 미디어아트 공공미술 전시를 살펴봐요.",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "공항처럼 많은 사람이 지나가는 곳에 작품을 두면 어떤 점이 좋을까요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "만약에 나라면?",
-                  "start": 215,
-                  "end": 278,
-                  "summary": "우리 학교에서 공공장소로 쓰이는 곳은 어디일까요? 나라면 어디에 어떤 작품을 설치하고 싶은지 생각해 봐요.",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "내가 작품을 설치하고 싶은 학교 공간은?",
-                        "그곳에 어울리는 메시지는?",
-                        "어떤 모양의 작품을 만들고 싶나요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "교실 속 미술 이야기",
-                  "start": 278,
-                  "end": 362.4,
-                  "summary": "테이프로 학교 공간에 작품을 만들고, 친구들의 작품 이야기를 들어 봐요.",
-                  "activity": [
-                    {
-                      "type": "check",
-                      "items": [
-                        "미션 1. 작품을 전시할 공간을 찾아보세요.",
-                        "미션 2. 공간과 어울리는 메시지를 찾아보세요.",
-                        "미션 3. 테이프 등을 활용해 작품을 만들어 보세요.",
-                        "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "내 작품 사진 올리기",
-                      "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
-                      "url": "https://biossam.github.io/public_art/?m=1&step=photo",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=1&teacher=1#gallery"
-                    }
-                  ]
-                },
-                {
-                  "title": "수업 마무리",
-                  "start": 362.4,
-                  "end": 466,
-                  "summary": "작품 이야기를 예술가 퀘스트에 남기고 공공미술가로 환생 완료!",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "오늘 만든 작품 제목과 담은 이야기는?"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "작품 이야기 쓰고 미션 완료하기",
-                      "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
-                      "url": "https://biossam.github.io/public_art/?m=1",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=1&teacher=1#gallery"
-                    }
-                  ]
-                }
-              ],
-              "thumb": "assets/img/thumbs/artist/1.jpg"
-            }
-          ],
-          "teacher": {
-            "worksheet": ""
-          }
-        },
-        {
-          "no": 2,
-          "title": "요즘 예술, 진짜요? 이것두요?",
-          "badge": "assets/img/badges/artist/2.png",
-          "topic": "동시대 공공미술가 · 낯선 것에서 예술 찾기",
-          "goal": "지금 우리 사회의 이야기를 담은 동시대 공공미술을 알아보고, 멸종위기 동물의 정면화를 그려 메시지를 전할 수 있다.",
-          "materials": [
-            "태블릿(스케치북 앱)"
-          ],
-          "videos": [
-            {
-              "youtubeId": "qp-MjuLml70",
-              "title": "동시대 공공미술가 편",
-              "parts": [
-                {
-                  "title": "들어가기",
-                  "start": 0,
-                  "end": 30.7,
-                  "summary": "오늘은 낯선 것에서 예술을 찾아봐요."
-                },
-                {
-                  "title": "예술이 왜 여기서 나와?",
-                  "start": 30.7,
-                  "end": 91.7,
-                  "summary": "미국과 멕시코 국경 장벽 사이에 놓인 분홍색 시소, 「Teeter-Totter Wall」을 만나요.",
-                  "links": [
-                    {
-                      "title": "국경 사이에 두고…시소 즐기는 미국-멕시코 아이들",
-                      "channel": "연합뉴스",
-                      "url": "https://www.youtube.com/watch?v=C93hB3WjMXE"
-                    }
-                  ],
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "국경 장벽에 시소를 설치한 걸 보고 어떤 생각이 들었나요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "이게 대체 무슨 뜻이지?",
-                  "start": 91.7,
-                  "end": 140,
-                  "summary": "지금 우리가 살아가는 이야기, 사회 속 문제를 작품으로 표현하는 것을 '동시대 공공미술'이라고 해요.",
-                  "activity": [
-                    {
-                      "type": "quiz",
-                      "q": "동시대 공공미술이 담는 것은?",
-                      "options": [
-                        "아주 오래전 왕의 이야기",
-                        "지금 우리가 살아가는 이야기와 사회 속 문제",
-                        "정해진 그림 그리는 방법"
-                      ],
-                      "answer": 1,
-                      "explain": "동시대 공공미술은 지금 우리 사회의 이야기와 문제를 작품으로 표현해요."
-                    }
-                  ]
-                },
-                {
-                  "title": "진짜로 있었던 이야기라고?",
-                  "start": 140,
-                  "end": 236.8,
-                  "summary": "벽 대신 다리를 만드는 작가 로널드 라엘과 버지니아 산 프라텔로의 이야기를 들어요.",
-                  "links": [
-                    {
-                      "title": "[SDF2019] 시소, 경계를 잇다 - 로널드 라엘",
-                      "channel": "SBS D FORUM (SDF)",
-                      "url": "https://www.youtube.com/watch?v=mCMLIVtyAdA"
-                    }
-                  ],
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "벽이 '나누는 것'이 아니라 '잇는 것'이 될 수 있다는 말은 무슨 뜻일까요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "만약에 나라면?",
-                  "start": 236.8,
-                  "end": 326.1,
-                  "summary": "지구가 뜨거워지며 많은 동물이 멸종 위기에 놓였어요. 나라면 어떤 동물을 살려 내고 싶나요?",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "내가 살려 내고 싶은 멸종위기 동물은?",
-                        "그 동물에게 어떤 일이 일어나고 있나요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "교실 속 미술 이야기",
-                  "start": 326.1,
-                  "end": 525.1,
-                  "summary": "인물화처럼 멸종위기 동물의 정면화를 그리고, 친구들의 작품을 감상해요.",
-                  "activity": [
-                    {
-                      "type": "check",
-                      "items": [
-                        "미션 1. 내가 살려 내고 싶은 멸종위기 동물을 떠올려 보세요.",
-                        "미션 2. 인물화처럼 동물의 정면 모습을 떠올려 보세요.",
-                        "미션 3. 스케치북 앱 등으로 멸종위기 동물의 정면화를 그려 보세요.",
-                        "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "내 작품 사진 올리기",
-                      "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
-                      "url": "https://biossam.github.io/public_art/?m=2&step=photo",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=2&teacher=1#gallery"
-                    }
-                  ]
-                },
-                {
-                  "title": "수업 마무리",
-                  "start": 525.1,
-                  "end": 623.4,
-                  "summary": "작품 이야기를 예술가 퀘스트에 남기고 동시대 공공미술가로 환생 완료!",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "오늘 살려 낸 동물과 작품 제목은?",
-                        "이 작품을 본 사람들이 무엇을 느끼면 좋겠나요?"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "작품 이야기 쓰고 미션 완료하기",
-                      "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
-                      "url": "https://biossam.github.io/public_art/?m=2",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=2&teacher=1#gallery"
-                    }
-                  ]
-                }
-              ],
-              "thumb": "assets/img/thumbs/artist/2.jpg"
-            }
-          ],
-          "teacher": {
-            "worksheet": ""
-          }
-        },
-        {
-          "no": 3,
-          "title": "여길 보세요! 내 목소리 들리나요?",
-          "badge": "assets/img/badges/artist/3.png",
-          "topic": "사회참여 공공미술가 · 사회 문제에서 예술 찾기",
-          "goal": "세상의 문제에 목소리를 내는 사회참여 공공미술을 알아보고, 알리고 싶은 사회 문제를 작품으로 표현할 수 있다.",
-          "materials": [
-            "클레이",
-            "병뚜껑 등 주변 재료",
-            "골판지"
-          ],
-          "videos": [
-            {
-              "youtubeId": "1HlqAr6rclQ",
-              "title": "사회참여 공공미술가 편",
-              "parts": [
-                {
-                  "title": "들어가기",
-                  "start": 0,
-                  "end": 28.3,
-                  "summary": "오늘은 사회 문제에서 예술을 찾아봐요."
-                },
-                {
-                  "title": "예술이 왜 여기서 나와?",
-                  "start": 28.3,
-                  "end": 112.3,
-                  "summary": "숲을 지키자는 메시지를 담은 거리 벽화, WWF의 #Together4Forests를 만나요.",
-                  "links": [
-                    {
-                      "title": "New Together for Forests Street Art in Brussels",
-                      "channel": "WWF European Policy Office",
-                      "url": "https://www.youtube.com/watch?v=SIzu6tNsEYs"
-                    },
-                    {
-                      "title": "Together4Forests 캠페인 소개",
-                      "channel": "WWF EU",
-                      "url": "https://www.wwf.eu/campaigns/together4forests/"
-                    }
-                  ],
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "벽화 속 동물들은 어떤 이야기를 하고 있는 것 같나요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "이게 대체 무슨 뜻이지?",
-                  "start": 112.3,
-                  "end": 143.5,
-                  "summary": "세상의 문제에 대해 목소리를 내고, 사람들의 생각과 행동을 바꾸려는 예술을 '사회참여 공공미술'이라고 해요.",
-                  "activity": [
-                    {
-                      "type": "quiz",
-                      "q": "사회참여 공공미술이 하려는 일은?",
-                      "options": [
-                        "세상의 문제에 목소리를 내고 사람들의 생각과 행동을 바꾸는 것",
-                        "건물을 예쁘게 꾸미기만 하는 것",
-                        "미술관에 작품을 숨겨 두는 것"
-                      ],
-                      "answer": 0,
-                      "explain": "사회참여 공공미술은 그림 한 점으로 더 큰 울림을 주어 사람들이 문제를 함께 생각하고 행동하게 만들어요."
-                    }
-                  ]
-                },
-                {
-                  "title": "진짜로 있었던 이야기라고?",
-                  "start": 143.5,
-                  "end": 202.1,
-                  "summary": "브뤼셀 거리 벽화를 보고 사람들이 사진을 찍어 #together4forests로 함께 참여한 이야기를 들어요.",
-                  "links": [
-                    {
-                      "title": "Together for Forests 벽화 이야기",
-                      "channel": "Street Art for Mankind",
-                      "url": "https://streetartmankind.org/together4forests/"
-                    }
-                  ],
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "사람들이 SNS로 함께 참여하면 어떤 변화가 생길까요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "만약에 나라면?",
-                  "start": 202.1,
-                  "end": 250.1,
-                  "summary": "나라면 어떤 사회 문제에 목소리를 내고 싶은지 생각해 봐요.",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "주변에 알리고 싶은 사회 문제는?",
-                        "그 문제를 어떤 작품으로 표현하고 싶나요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "교실 속 미술 이야기",
-                  "start": 250.1,
-                  "end": 342.4,
-                  "summary": "클레이와 병뚜껑으로 작품을 만들고, 해시태그를 달아 친구들에게 알려요.",
-                  "activity": [
-                    {
-                      "type": "check",
-                      "items": [
-                        "미션 1. 주변에 알리고 싶은 사회 문제를 떠올려 보세요.",
-                        "미션 2. 사회 문제를 예술로 표현할 방법을 떠올려 보세요.",
-                        "미션 3. 클레이, 병뚜껑 등을 활용해 작품을 만들어 보세요.",
-                        "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "내 작품 사진 올리기",
-                      "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
-                      "url": "https://biossam.github.io/public_art/?m=3&step=photo",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=3&teacher=1#gallery"
-                    }
-                  ]
-                },
-                {
-                  "title": "수업 마무리",
-                  "start": 342.4,
-                  "end": 436.5,
-                  "summary": "작품 이야기를 예술가 퀘스트에 남기고 사회참여 공공미술가로 환생 완료!",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "내 작품에 달고 싶은 해시태그는?",
-                        "이 작품으로 사람들에게 하고 싶은 말은?"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "작품 이야기 쓰고 미션 완료하기",
-                      "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
-                      "url": "https://biossam.github.io/public_art/?m=3",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=3&teacher=1#gallery"
-                    }
-                  ]
-                }
-              ],
-              "thumb": "assets/img/thumbs/artist/3.jpg"
-            }
-          ],
-          "teacher": {
-            "worksheet": ""
-          }
-        },
-        {
-          "no": 4,
-          "title": "버려진 걸로 지구를 구한다구요?",
-          "badge": "assets/img/badges/artist/4.png",
-          "topic": "재사용 공공미술가 · 버려진 것에서 예술 찾기",
-          "goal": "버려지는 것에 아이디어를 더해 새로운 가치를 만드는 재사용 공공미술을 알아보고, 주변 재료로 작품을 만들 수 있다.",
-          "materials": [
-            "양말목 등 버려지는 재료"
-          ],
-          "videos": [
-            {
-              "youtubeId": "-6QyXki60a0",
-              "title": "재사용 공공미술가 편",
-              "parts": [
-                {
-                  "title": "들어가기",
-                  "start": 0,
-                  "end": 28.8,
-                  "summary": "오늘은 버려진 것에서 예술을 찾아봐요."
-                },
-                {
-                  "title": "예술이 왜 여기서 나와?",
-                  "start": 28.8,
-                  "end": 76.5,
-                  "summary": "바다에 버려진 쓰레기로 만든 10미터 고래, 김상연 작가의 「바다와 함께」를 만나요.",
-                  "links": [
-                    {
-                      "title": "'10미터 크기 고래형상' 공공미술작품 바다의날 기념식서 공개",
-                      "channel": "전남일보",
-                      "url": "https://www.youtube.com/watch?v=eTHCbqOfIjQ"
-                    }
-                  ],
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "쓰레기로 만든 고래를 보면 어떤 생각이 드나요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "이게 대체 무슨 뜻이지?",
-                  "start": 76.5,
-                  "end": 112.5,
-                  "summary": "버려지는 것에 디자인과 아이디어를 더해 새로운 가치를 만드는 것을 '재사용 공공미술'이라고 해요.",
-                  "activity": [
-                    {
-                      "type": "quiz",
-                      "q": "재사용 공공미술에서 작품의 재료가 될 수 있는 것은?",
-                      "options": [
-                        "미술 가게에서 산 새 물감만",
-                        "우리 주변의 모든 것, 버려진 물건까지",
-                        "값비싼 금속만"
-                      ],
-                      "answer": 1,
-                      "explain": "예술을 위한 재료는 정해져 있지 않아요. 버려진 물건도 아이디어를 더하면 작품이 돼요."
-                    }
-                  ]
-                },
-                {
-                  "title": "진짜로 있었던 이야기라고?",
-                  "start": 112.5,
-                  "end": 186.9,
-                  "summary": "시민과 함께 모은 해양쓰레기로 만든 전시 「일용할 양식」을 살펴봐요.",
-                  "links": [
-                    {
-                      "title": "바다 오염 알리는 예술작품으로 재탄생한 '해양쓰레기'",
-                      "channel": "전주MBC News",
-                      "url": "https://www.youtube.com/watch?v=kO3oqp01aZA"
-                    }
-                  ],
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "해양쓰레기로 만든 작품이 바다를 살리는 데 어떻게 도움이 될까요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "만약에 나라면?",
-                  "start": 186.9,
-                  "end": 223.7,
-                  "summary": "나라면 어떤 버려진 재료로 어떤 작품을 만들고 싶은지 생각해 봐요.",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "주변에서 쉽게 버려지는 것은?",
-                        "그 재료로 무엇을 만들 수 있을까요?"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "title": "교실 속 미술 이야기",
-                  "start": 223.7,
-                  "end": 429.1,
-                  "summary": "버려진 양말목으로 키링과 방석을 만들고 작품 이야기를 나눠요.",
-                  "activity": [
-                    {
-                      "type": "check",
-                      "items": [
-                        "미션 1. 주변에서 쉽게 버려지는 것들을 떠올려 보세요.",
-                        "미션 2. 버려진 것에서 새로운 가치를 찾아보세요.",
-                        "미션 3. 양말목 등 주변의 재료를 활용해 작품을 만들어 보세요.",
-                        "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "내 작품 사진 올리기",
-                      "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
-                      "url": "https://biossam.github.io/public_art/?m=4&step=photo",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=4&teacher=1#gallery"
-                    }
-                  ]
-                },
-                {
-                  "title": "수업 마무리",
-                  "start": 429.1,
-                  "end": 500.7,
-                  "summary": "작품 이야기를 예술가 퀘스트에 남기고 재사용 공공미술가로 환생 완료!",
-                  "activity": [
-                    {
-                      "type": "write",
-                      "prompts": [
-                        "오늘 만든 작품과 사용한 재료는?",
-                        "버려지는 것을 줄이기 위해 내가 할 수 있는 일은?"
-                      ]
-                    }
-                  ],
-                  "links": [
-                    {
-                      "title": "작품 이야기 쓰고 미션 완료하기",
-                      "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
-                      "url": "https://biossam.github.io/public_art/?m=4",
-                      "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
-                      "teacherUrl": "https://biossam.github.io/public_art/?m=4&teacher=1#gallery"
-                    }
-                  ]
-                }
-              ],
-              "thumb": "assets/img/thumbs/artist/4.jpg"
-            }
-          ],
-          "teacher": {
-            "worksheet": ""
-          }
-        }
-      ]
-    }
+ "course": {
+  "title": "어느 날 눈떠보니 예술가가 되었다",
+  "tagline": "2025 경기온라인학교 · 공공미술 편",
+  "subject": "미술",
+  "grade": "초등 6학년",
+  "author": "장혜림",
+  "credits": [
+   "수업 영상: 경기온라인학교 × 경기도공공미술교육연구회 (기획 장혜림)",
+   "사이트용 편집본은 얼굴이 나오는 장면을 수업 자료 화면으로 바꾸고 목소리와 자막은 그대로 두었습니다.",
+   "차시 배지: Google Gemini로 생성한 이미지"
+  ],
+  "lessonWord": "편",
+  "noWorksheet": true,
+  "teacherLinks": [
+   {
+    "title": "🖼️ 우리 반 전시회 만들기 (선생님용)",
+    "url": "https://biossam.github.io/public_art/?teacher=1#gallery"
+   }
   ]
+ },
+ "units": [
+  {
+   "id": "publicart",
+   "title": "공공미술 편",
+   "lessons": [
+    {
+     "no": 1,
+     "title": "길 위의 예술, 나도 함께라구요?",
+     "badge": "assets/img/badges/artist/1.png",
+     "topic": "공공미술가 · 일상 공간에서 예술 찾기",
+     "goal": "우리 주변 공간에 놓인 공공미술을 알아보고, 학교 공간에 어울리는 작품을 만들어 설치할 수 있다.",
+     "materials": [
+      "마스킹 테이프(색 테이프)",
+      "태블릿"
+     ],
+     "videos": [
+      {
+       "youtubeId": "DYJX4PTH7ik",
+       "title": "공공미술가 편",
+       "parts": [
+        {
+         "title": "들어가기",
+         "start": 0,
+         "end": 31,
+         "summary": "오늘은 일상 공간에서 예술을 찾아봐요."
+        },
+        {
+         "title": "예술이 왜 여기서 나와?",
+         "start": 31,
+         "end": 95.5,
+         "summary": "7층 건물 꼭대기에 놓인 작은 집, 서도호의 「Fallen Star」를 만나요.",
+         "links": [
+          {
+           "title": "Do Ho Suh: Fallen Star (1:30~2:01)",
+           "channel": "University of California Television (UCTV)",
+           "url": "https://www.youtube.com/watch?v=bG_y5mZga08&t=90s"
+          }
+         ],
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "건물 꼭대기에 집이 놓여 있는 걸 처음 보면 어떤 기분이 들까요?",
+            "이 작품이 미술관 안에 있었다면 무엇이 달라졌을까요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "이게 대체 무슨 뜻이지?",
+         "start": 95.5,
+         "end": 129,
+         "summary": "미술관 밖, 여러 사람이 함께 보고 느끼는 예술을 '공공미술'이라고 해요.",
+         "activity": [
+          {
+           "type": "quiz",
+           "q": "공공미술에 대한 설명으로 알맞은 것은?",
+           "options": [
+            "미술관 안에서만 볼 수 있는 작품",
+            "우리 주변의 여러 사람이 함께 보고 느끼는 예술",
+            "작가 혼자 간직하는 작품"
+           ],
+           "answer": 1,
+           "explain": "벽화, 조형물, 바닥 그림처럼 우리 주변 공간에 놓여 누구나 함께 볼 수 있는 예술이 공공미술이에요."
+          }
+         ]
+        },
+        {
+         "title": "진짜로 있었던 이야기라고?",
+         "start": 129,
+         "end": 215,
+         "summary": "인천국제공항 제2터미널에서 열린 미디어아트 공공미술 전시를 살펴봐요.",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "공항처럼 많은 사람이 지나가는 곳에 작품을 두면 어떤 점이 좋을까요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "만약에 나라면?",
+         "start": 215,
+         "end": 278,
+         "summary": "우리 학교에서 공공장소로 쓰이는 곳은 어디일까요? 나라면 어디에 어떤 작품을 설치하고 싶은지 생각해 봐요.",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "내가 작품을 설치하고 싶은 학교 공간은?",
+            "그곳에 어울리는 메시지는?",
+            "어떤 모양의 작품을 만들고 싶나요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "교실 속 미술 이야기",
+         "start": 278,
+         "end": 362.4,
+         "summary": "테이프로 학교 공간에 작품을 만들고, 친구들의 작품 이야기를 들어 봐요.",
+         "activity": [
+          {
+           "type": "check",
+           "items": [
+            "미션 1. 작품을 전시할 공간을 찾아보세요.",
+            "미션 2. 공간과 어울리는 메시지를 찾아보세요.",
+            "미션 3. 테이프 등을 활용해 작품을 만들어 보세요.",
+            "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "내 작품 사진 올리기",
+           "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
+           "url": "https://biossam.github.io/public_art/?m=1&step=photo",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=1&teacher=1#gallery"
+          }
+         ]
+        },
+        {
+         "title": "수업 마무리",
+         "start": 362.4,
+         "end": 466,
+         "summary": "작품 이야기를 예술가 퀘스트에 남기고 공공미술가로 환생 완료!",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "오늘 만든 작품 제목과 담은 이야기는?"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "작품 이야기 쓰고 미션 완료하기",
+           "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
+           "url": "https://biossam.github.io/public_art/?m=1",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=1&teacher=1#gallery"
+          }
+         ]
+        }
+       ],
+       "thumb": "assets/img/thumbs/artist/1.jpg"
+      }
+     ],
+     "teacher": {
+      "worksheet": ""
+     },
+     "listTitle": "공공미술가"
+    },
+    {
+     "no": 2,
+     "title": "요즘 예술, 진짜요? 이것두요?",
+     "badge": "assets/img/badges/artist/2.png",
+     "topic": "동시대 공공미술가 · 낯선 것에서 예술 찾기",
+     "goal": "지금 우리 사회의 이야기를 담은 동시대 공공미술을 알아보고, 멸종위기 동물의 정면화를 그려 메시지를 전할 수 있다.",
+     "materials": [
+      "태블릿(스케치북 앱)"
+     ],
+     "videos": [
+      {
+       "youtubeId": "qp-MjuLml70",
+       "title": "동시대 공공미술가 편",
+       "parts": [
+        {
+         "title": "들어가기",
+         "start": 0,
+         "end": 30.7,
+         "summary": "오늘은 낯선 것에서 예술을 찾아봐요."
+        },
+        {
+         "title": "예술이 왜 여기서 나와?",
+         "start": 30.7,
+         "end": 91.7,
+         "summary": "미국과 멕시코 국경 장벽 사이에 놓인 분홍색 시소, 「Teeter-Totter Wall」을 만나요.",
+         "links": [
+          {
+           "title": "국경 사이에 두고…시소 즐기는 미국-멕시코 아이들",
+           "channel": "연합뉴스",
+           "url": "https://www.youtube.com/watch?v=C93hB3WjMXE"
+          }
+         ],
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "국경 장벽에 시소를 설치한 걸 보고 어떤 생각이 들었나요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "이게 대체 무슨 뜻이지?",
+         "start": 91.7,
+         "end": 140,
+         "summary": "지금 우리가 살아가는 이야기, 사회 속 문제를 작품으로 표현하는 것을 '동시대 공공미술'이라고 해요.",
+         "activity": [
+          {
+           "type": "quiz",
+           "q": "동시대 공공미술이 담는 것은?",
+           "options": [
+            "아주 오래전 왕의 이야기",
+            "지금 우리가 살아가는 이야기와 사회 속 문제",
+            "정해진 그림 그리는 방법"
+           ],
+           "answer": 1,
+           "explain": "동시대 공공미술은 지금 우리 사회의 이야기와 문제를 작품으로 표현해요."
+          }
+         ]
+        },
+        {
+         "title": "진짜로 있었던 이야기라고?",
+         "start": 140,
+         "end": 236.8,
+         "summary": "벽 대신 다리를 만드는 작가 로널드 라엘과 버지니아 산 프라텔로의 이야기를 들어요.",
+         "links": [
+          {
+           "title": "[SDF2019] 시소, 경계를 잇다 - 로널드 라엘",
+           "channel": "SBS D FORUM (SDF)",
+           "url": "https://www.youtube.com/watch?v=mCMLIVtyAdA"
+          }
+         ],
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "벽이 '나누는 것'이 아니라 '잇는 것'이 될 수 있다는 말은 무슨 뜻일까요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "만약에 나라면?",
+         "start": 236.8,
+         "end": 326.1,
+         "summary": "지구가 뜨거워지며 많은 동물이 멸종 위기에 놓였어요. 나라면 어떤 동물을 살려 내고 싶나요?",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "내가 살려 내고 싶은 멸종위기 동물은?",
+            "그 동물에게 어떤 일이 일어나고 있나요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "교실 속 미술 이야기",
+         "start": 326.1,
+         "end": 525.1,
+         "summary": "인물화처럼 멸종위기 동물의 정면화를 그리고, 친구들의 작품을 감상해요.",
+         "activity": [
+          {
+           "type": "check",
+           "items": [
+            "미션 1. 내가 살려 내고 싶은 멸종위기 동물을 떠올려 보세요.",
+            "미션 2. 인물화처럼 동물의 정면 모습을 떠올려 보세요.",
+            "미션 3. 스케치북 앱 등으로 멸종위기 동물의 정면화를 그려 보세요.",
+            "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "내 작품 사진 올리기",
+           "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
+           "url": "https://biossam.github.io/public_art/?m=2&step=photo",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=2&teacher=1#gallery"
+          }
+         ]
+        },
+        {
+         "title": "수업 마무리",
+         "start": 525.1,
+         "end": 623.4,
+         "summary": "작품 이야기를 예술가 퀘스트에 남기고 동시대 공공미술가로 환생 완료!",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "오늘 살려 낸 동물과 작품 제목은?",
+            "이 작품을 본 사람들이 무엇을 느끼면 좋겠나요?"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "작품 이야기 쓰고 미션 완료하기",
+           "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
+           "url": "https://biossam.github.io/public_art/?m=2",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=2&teacher=1#gallery"
+          }
+         ]
+        }
+       ],
+       "thumb": "assets/img/thumbs/artist/2.jpg"
+      }
+     ],
+     "teacher": {
+      "worksheet": ""
+     },
+     "listTitle": "동시대 공공미술가"
+    },
+    {
+     "no": 3,
+     "title": "여길 보세요! 내 목소리 들리나요?",
+     "badge": "assets/img/badges/artist/3.png",
+     "topic": "사회참여 공공미술가 · 사회 문제에서 예술 찾기",
+     "goal": "세상의 문제에 목소리를 내는 사회참여 공공미술을 알아보고, 알리고 싶은 사회 문제를 작품으로 표현할 수 있다.",
+     "materials": [
+      "클레이",
+      "병뚜껑 등 주변 재료",
+      "골판지"
+     ],
+     "videos": [
+      {
+       "youtubeId": "1HlqAr6rclQ",
+       "title": "사회참여 공공미술가 편",
+       "parts": [
+        {
+         "title": "들어가기",
+         "start": 0,
+         "end": 28.3,
+         "summary": "오늘은 사회 문제에서 예술을 찾아봐요."
+        },
+        {
+         "title": "예술이 왜 여기서 나와?",
+         "start": 28.3,
+         "end": 112.3,
+         "summary": "숲을 지키자는 메시지를 담은 거리 벽화, WWF의 #Together4Forests를 만나요.",
+         "links": [
+          {
+           "title": "New Together for Forests Street Art in Brussels",
+           "channel": "WWF European Policy Office",
+           "url": "https://www.youtube.com/watch?v=SIzu6tNsEYs"
+          },
+          {
+           "title": "Together4Forests 캠페인 소개",
+           "channel": "WWF EU",
+           "url": "https://www.wwf.eu/campaigns/together4forests/"
+          }
+         ],
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "벽화 속 동물들은 어떤 이야기를 하고 있는 것 같나요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "이게 대체 무슨 뜻이지?",
+         "start": 112.3,
+         "end": 143.5,
+         "summary": "세상의 문제에 대해 목소리를 내고, 사람들의 생각과 행동을 바꾸려는 예술을 '사회참여 공공미술'이라고 해요.",
+         "activity": [
+          {
+           "type": "quiz",
+           "q": "사회참여 공공미술이 하려는 일은?",
+           "options": [
+            "세상의 문제에 목소리를 내고 사람들의 생각과 행동을 바꾸는 것",
+            "건물을 예쁘게 꾸미기만 하는 것",
+            "미술관에 작품을 숨겨 두는 것"
+           ],
+           "answer": 0,
+           "explain": "사회참여 공공미술은 그림 한 점으로 더 큰 울림을 주어 사람들이 문제를 함께 생각하고 행동하게 만들어요."
+          }
+         ]
+        },
+        {
+         "title": "진짜로 있었던 이야기라고?",
+         "start": 143.5,
+         "end": 202.1,
+         "summary": "브뤼셀 거리 벽화를 보고 사람들이 사진을 찍어 #together4forests로 함께 참여한 이야기를 들어요.",
+         "links": [
+          {
+           "title": "Together for Forests 벽화 이야기",
+           "channel": "Street Art for Mankind",
+           "url": "https://streetartmankind.org/together4forests/"
+          }
+         ],
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "사람들이 SNS로 함께 참여하면 어떤 변화가 생길까요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "만약에 나라면?",
+         "start": 202.1,
+         "end": 250.1,
+         "summary": "나라면 어떤 사회 문제에 목소리를 내고 싶은지 생각해 봐요.",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "주변에 알리고 싶은 사회 문제는?",
+            "그 문제를 어떤 작품으로 표현하고 싶나요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "교실 속 미술 이야기",
+         "start": 250.1,
+         "end": 342.4,
+         "summary": "클레이와 병뚜껑으로 작품을 만들고, 해시태그를 달아 친구들에게 알려요.",
+         "activity": [
+          {
+           "type": "check",
+           "items": [
+            "미션 1. 주변에 알리고 싶은 사회 문제를 떠올려 보세요.",
+            "미션 2. 사회 문제를 예술로 표현할 방법을 떠올려 보세요.",
+            "미션 3. 클레이, 병뚜껑 등을 활용해 작품을 만들어 보세요.",
+            "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "내 작품 사진 올리기",
+           "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
+           "url": "https://biossam.github.io/public_art/?m=3&step=photo",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=3&teacher=1#gallery"
+          }
+         ]
+        },
+        {
+         "title": "수업 마무리",
+         "start": 342.4,
+         "end": 436.5,
+         "summary": "작품 이야기를 예술가 퀘스트에 남기고 사회참여 공공미술가로 환생 완료!",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "내 작품에 달고 싶은 해시태그는?",
+            "이 작품으로 사람들에게 하고 싶은 말은?"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "작품 이야기 쓰고 미션 완료하기",
+           "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
+           "url": "https://biossam.github.io/public_art/?m=3",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=3&teacher=1#gallery"
+          }
+         ]
+        }
+       ],
+       "thumb": "assets/img/thumbs/artist/3.jpg"
+      }
+     ],
+     "teacher": {
+      "worksheet": ""
+     },
+     "listTitle": "사회참여 공공미술가"
+    },
+    {
+     "no": 4,
+     "title": "버려진 걸로 지구를 구한다구요?",
+     "badge": "assets/img/badges/artist/4.png",
+     "topic": "재사용 공공미술가 · 버려진 것에서 예술 찾기",
+     "goal": "버려지는 것에 아이디어를 더해 새로운 가치를 만드는 재사용 공공미술을 알아보고, 주변 재료로 작품을 만들 수 있다.",
+     "materials": [
+      "양말목 등 버려지는 재료"
+     ],
+     "videos": [
+      {
+       "youtubeId": "-6QyXki60a0",
+       "title": "재사용 공공미술가 편",
+       "parts": [
+        {
+         "title": "들어가기",
+         "start": 0,
+         "end": 28.8,
+         "summary": "오늘은 버려진 것에서 예술을 찾아봐요."
+        },
+        {
+         "title": "예술이 왜 여기서 나와?",
+         "start": 28.8,
+         "end": 76.5,
+         "summary": "바다에 버려진 쓰레기로 만든 10미터 고래, 김상연 작가의 「바다와 함께」를 만나요.",
+         "links": [
+          {
+           "title": "'10미터 크기 고래형상' 공공미술작품 바다의날 기념식서 공개",
+           "channel": "전남일보",
+           "url": "https://www.youtube.com/watch?v=eTHCbqOfIjQ"
+          }
+         ],
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "쓰레기로 만든 고래를 보면 어떤 생각이 드나요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "이게 대체 무슨 뜻이지?",
+         "start": 76.5,
+         "end": 112.5,
+         "summary": "버려지는 것에 디자인과 아이디어를 더해 새로운 가치를 만드는 것을 '재사용 공공미술'이라고 해요.",
+         "activity": [
+          {
+           "type": "quiz",
+           "q": "재사용 공공미술에서 작품의 재료가 될 수 있는 것은?",
+           "options": [
+            "미술 가게에서 산 새 물감만",
+            "우리 주변의 모든 것, 버려진 물건까지",
+            "값비싼 금속만"
+           ],
+           "answer": 1,
+           "explain": "예술을 위한 재료는 정해져 있지 않아요. 버려진 물건도 아이디어를 더하면 작품이 돼요."
+          }
+         ]
+        },
+        {
+         "title": "진짜로 있었던 이야기라고?",
+         "start": 112.5,
+         "end": 186.9,
+         "summary": "시민과 함께 모은 해양쓰레기로 만든 전시 「일용할 양식」을 살펴봐요.",
+         "links": [
+          {
+           "title": "바다 오염 알리는 예술작품으로 재탄생한 '해양쓰레기'",
+           "channel": "전주MBC News",
+           "url": "https://www.youtube.com/watch?v=kO3oqp01aZA"
+          }
+         ],
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "해양쓰레기로 만든 작품이 바다를 살리는 데 어떻게 도움이 될까요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "만약에 나라면?",
+         "start": 186.9,
+         "end": 223.7,
+         "summary": "나라면 어떤 버려진 재료로 어떤 작품을 만들고 싶은지 생각해 봐요.",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "주변에서 쉽게 버려지는 것은?",
+            "그 재료로 무엇을 만들 수 있을까요?"
+           ]
+          }
+         ]
+        },
+        {
+         "title": "교실 속 미술 이야기",
+         "start": 223.7,
+         "end": 429.1,
+         "summary": "버려진 양말목으로 키링과 방석을 만들고 작품 이야기를 나눠요.",
+         "activity": [
+          {
+           "type": "check",
+           "items": [
+            "미션 1. 주변에서 쉽게 버려지는 것들을 떠올려 보세요.",
+            "미션 2. 버려진 것에서 새로운 가치를 찾아보세요.",
+            "미션 3. 양말목 등 주변의 재료를 활용해 작품을 만들어 보세요.",
+            "미션 4. 작품 사진을 찍어 올려 보세요. (작품 이야기는 수업 마무리 때 써요)"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "내 작품 사진 올리기",
+           "channel": "예술가 퀘스트 · 사진을 올리면 친구들도 갤러리에서 볼 수 있어요",
+           "url": "https://biossam.github.io/public_art/?m=4&step=photo",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=4&teacher=1#gallery"
+          }
+         ]
+        },
+        {
+         "title": "수업 마무리",
+         "start": 429.1,
+         "end": 500.7,
+         "summary": "작품 이야기를 예술가 퀘스트에 남기고 재사용 공공미술가로 환생 완료!",
+         "activity": [
+          {
+           "type": "write",
+           "prompts": [
+            "오늘 만든 작품과 사용한 재료는?",
+            "버려지는 것을 줄이기 위해 내가 할 수 있는 일은?"
+           ]
+          }
+         ],
+         "links": [
+          {
+           "title": "작품 이야기 쓰고 미션 완료하기",
+           "channel": "예술가 퀘스트 · 사진과 이야기를 모두 올리면 배지를 받아요",
+           "url": "https://biossam.github.io/public_art/?m=4",
+           "teacherTitle": "우리 반 작품 모아 보기 · 전시회 만들기 (선생님용)",
+           "teacherUrl": "https://biossam.github.io/public_art/?m=4&teacher=1#gallery"
+          }
+         ]
+        }
+       ],
+       "thumb": "assets/img/thumbs/artist/4.jpg"
+      }
+     ],
+     "teacher": {
+      "worksheet": ""
+     },
+     "listTitle": "재사용 공공미술가"
+    }
+   ]
+  }
+ ]
 }
