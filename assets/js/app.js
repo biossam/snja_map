@@ -374,7 +374,7 @@ function renderHome() {
       ${course.keyQuestion ? `<div class="key-question"><span>${esc(course.keyLabel || "핵심 질문")}</span>${esc(course.keyQuestion)}</div>` : ""}
       ${(course.points ?? []).length ? `<div class="points"><p class="points-title">모아 보는 칭찬포인트</p><ul>${course.points.map((x) => `<li title="${esc(x.desc || "")}">${x.img ? `<img src="${esc(x.img)}" alt="" width="60" height="72" loading="lazy">` : ""}<b>${esc(x.name)}</b><small>${esc(x.desc || "")}</small></li>`).join("")}</ul></div>` : ""}
       ${isStudent ? "" : `<a class="text-link" href="${homeHref()}/qr">학생용 QR 코드 보기</a>`}
-      ${isStudent || !course.slideCourse ? "" : `<a class="text-link" href="${homeHref()}/live/1">실시간 현황 보기</a>`}
+      ${isStudent || !allLessons().some(({ lesson }) => lesson.sheet) ? "" : `<a class="text-link" href="${homeHref()}/live/${allLessons().find(({ lesson }) => lesson.sheet).lesson.no}">실시간 현황 보기</a>`}
       ${isStudent ? "" : (course.teacherLinks ?? []).map((l) => safeUrl(l.url)
         ? `<a class="text-link teacher-link" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.title)}</a>` : "").join("")}
     </section></aside>
@@ -582,7 +582,7 @@ function renderLesson(unitId, no, pick = 0) {
 
     ${figuresSection(lesson)}
 
-    ${sheetHtml(lesson)}
+    ${lesson.partsSheet ? (isStudent ? sheetHtml(lesson, { partsPanel: true }) : "") : sheetHtml(lesson)}
 
     ${details
       ? `<div class="details">${details}</div>`
@@ -642,21 +642,24 @@ function partsBlock(video, k) {
     </section>`;
 }
 
-function activityHtml(a, j, st) {
+// 파트마다 칸 이름을 따로 씀: "파트번호:활동번호-칸번호" (예전에는 파트끼리 이름이 겹쳐 한 파트에 쓴 글이 다른 파트에도 보였음)
+// 예전 이름(파트번호 없이)으로 저장된 글은 첫 파트에서만 이어서 보여 줌
+const partVal = (bag, i, key) => bag?.[`${i}:${key}`] ?? (i === 0 ? bag?.[key] : undefined);
+function activityHtml(a, j, st, i = 0) {
   if (a.type === "write") {
     return `<div class="act act-write">${a.prompts.map((q, n) => `
-      <label class="act-q" for="w-${j}-${n}">${esc(q)}</label>
-      <textarea id="w-${j}-${n}" data-w="${j}-${n}" rows="2" placeholder="내 생각을 써 보세요.">${esc(st.w?.[`${j}-${n}`] ?? "")}</textarea>`).join("")}</div>`;
+      <label class="act-q" for="w-${i}-${j}-${n}">${esc(q)}</label>
+      <textarea id="w-${i}-${j}-${n}" data-w="${i}:${j}-${n}" rows="2" placeholder="내 생각을 써 보세요.">${esc(partVal(st.w, i, `${j}-${n}`) ?? "")}</textarea>`).join("")}</div>`;
   }
   if (a.type === "quiz") {
-    const picked = st.q?.[j];
+    const picked = partVal(st.q, i, String(j));
     return `<fieldset class="act act-quiz"><legend class="act-q">${esc(a.q)}</legend>
-      ${a.options.map((o, n) => `<button type="button" class="quiz-opt${picked === n ? (n === a.answer ? " is-right" : " is-wrong") : ""}" data-q="${j}" data-o="${n}">${esc(o)}</button>`).join("")}
+      ${a.options.map((o, n) => `<button type="button" class="quiz-opt${picked === n ? (n === a.answer ? " is-right" : " is-wrong") : ""}" data-q="${i}:${j}" data-o="${n}">${esc(o)}</button>`).join("")}
       <p class="quiz-explain"${picked === undefined ? " hidden" : ""}>${picked === a.answer ? "정답이에요! " : picked === undefined ? "" : "다시 생각해 봐요. "}${picked === a.answer ? esc(a.explain || "") : ""}</p></fieldset>`;
   }
   if (a.type === "check") {
     return `<ul class="act act-check">${a.items.map((t, n) => `<li><label>
-      <input type="checkbox" data-c="${j}-${n}"${st.c?.[`${j}-${n}`] ? " checked" : ""}><span>${esc(t)}</span></label></li>`).join("")}</ul>`;
+      <input type="checkbox" data-c="${i}:${j}-${n}"${partVal(st.c, i, `${j}-${n}`) ? " checked" : ""}><span>${esc(t)}</span></label></li>`).join("")}</ul>`;
   }
   return "";
 }
@@ -667,7 +670,10 @@ function bindParts(unit, lesson, video, k) {
   const key = `${badgeKey(cid, unit, lesson)}/v${k}`;
   const parts = video.parts;
   const state = () => readParts()[key] ?? {};
-  const save = (fn) => { const all = readParts(); all[key] = all[key] ?? {}; fn(all[key]); writeParts(all); };
+  const save = (fn) => {
+    const all = readParts(); all[key] = all[key] ?? {}; fn(all[key]); writeParts(all);
+    if (lesson.partsSheet) { document.querySelectorAll(".sheet").forEach((b) => paintSheetProgress(lesson, b)); liveSoon(lesson); }
+  };
   let cur = -1, stopAt = null, ctl = null;
 
   // 재생기: 유튜브(youtubeId) 또는 mp4 파일(file)
@@ -722,7 +728,7 @@ function bindParts(unit, lesson, video, k) {
       const title = t ? (l.teacherTitle || l.title) : l.title;
       return u ? `<li><a class="part-link" href="${esc(u)}" target="_blank" rel="noopener">${icon.external}<span><b>${esc(title)}</b>${!t && l.channel ? `<small>${esc(l.channel)}</small>` : ""}</span></a></li>` : "";
     }).join("");
-    const acts = (p.activity ?? []).map((a, j) => activityHtml(a, j, st)).join("");
+    const acts = (p.activity ?? []).map((a, j) => activityHtml(a, j, st, i)).join("");
     root.querySelector(".part-panel").innerHTML = `
       <p class="part-kicker">파트 ${i + 1} · ${fmtTime(p.start)}~${fmtTime(p.end)}</p>
       <h2 class="part-title">${esc(p.title)}</h2>
@@ -1374,6 +1380,7 @@ async function route() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       loaded[id] = { course: data.course, units: data.units ?? [] };
+      attachPartsSheets(loaded[id].units);
     }
   }
   cid = id;
@@ -1563,18 +1570,55 @@ function bindSlideViewer(lesson) {
 }
 
 /* ---------- 웹 활동지 ---------- */
-function sheetState(lesson) { return readJSON(SHEET_KEY)[`${cid}/${lesson.no}`] ?? {}; }
+function sheetState(lesson) {
+  if (lesson.partsSheet) return partsFields(lesson);
+  return readJSON(SHEET_KEY)[`${cid}/${lesson.no}`] ?? {};
+}
+
+/* ---------- 파트 영상 활동을 활동지처럼 다루기 ----------
+   「어느 날 눈떠보니 예술가」처럼 영상 파트마다 생각 쓰기·퀴즈·미션 체크가 있는 차시는
+   파트 하나를 활동지 칸 하나로 보고, 실시간 현황·제출·CSV를 다른 교재와 같은 방식으로 씀. */
+function attachPartsSheets(units) {
+  units.forEach((u) => (u.lessons ?? []).forEach((l) => {
+    l._unit = u.id;
+    if (l.sheet || !(l.videos ?? []).some((v) => v.parts?.length)) return;
+    const parts = [];
+    (l.videos ?? []).forEach((v, k) => (v.parts ?? []).forEach((p, i) => {
+      const items = [];
+      (p.activity ?? []).forEach((a, j) => {
+        if (a.type === "write") a.prompts.forEach((q, n) => items.push({ type: "text", label: q, lines: 2, src: { k, i, kind: "w", key: `${j}-${n}` } }));
+        if (a.type === "quiz") items.push({ type: "choice", label: a.q, options: a.options, src: { k, i, kind: "q", key: String(j) } });
+        if (a.type === "check") items.push({ type: "choice", label: "미션 체크", options: a.items, multi: true, src: { k, i, kind: "c", key: String(j) } });
+      });
+      if (items.length) parts.push({ title: p.title, items });
+    }));
+    if (parts.length) { l.sheet = { title: `${l.no}편 활동`, parts }; l.partsSheet = true; }
+  }));
+}
+
+function partsFields(lesson) {
+  const all = readParts(); const f = {};
+  lesson.sheet.parts.forEach((p, pi) => p.items.forEach((it, ii) => {
+    const src = it.src; if (!src) return;
+    const st = all[`${cid}/${lesson._unit}/${lesson.no}/v${src.k}`] ?? {};
+    const id = `p${pi}.${ii}`;
+    if (src.kind === "w") { const v = partVal(st.w, src.i, src.key); if (v) f[id] = v; }
+    if (src.kind === "q") { const v = partVal(st.q, src.i, src.key); if (v !== undefined && v !== null) f[id] = v; }
+    if (src.kind === "c") { const on = it.options.map((_, n) => (partVal(st.c, src.i, `${src.key}-${n}`) ? n : -1)).filter((n) => n >= 0); if (on.length) f[id] = on; }
+  }));
+  return f;
+}
 
 function sheetHtml(lesson, opts = {}) {
   const sh = lesson.sheet;
   if (!sh?.parts?.length) return "";
   const st = sheetState(lesson);
   const me = readJSON(ME_KEY);
-  const parts = sh.parts.map((p, pi) => partHtml(lesson, p, pi, st, opts)).join("");
+  const parts = opts.partsPanel ? "" : sh.parts.map((p, pi) => partHtml(lesson, p, pi, st, opts)).join("");
   const live = Boolean(LIVE.url) && isStudent;
   return `
     <section class="sheet${opts.big ? " is-big" : ""}${opts.readonly ? " is-readonly" : ""}" aria-label="${esc(sh.title || "활동지")}">
-      ${opts.big || opts.readonly ? "" : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? (live ? "여기에 바로 써요. 쓴 내용은 이 기기에 저장되고, 교실 링크 참여 코드를 넣으면 선생님 화면에도 바로 보여요." : "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.") : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
+      ${opts.big || opts.readonly ? "" : opts.partsPanel ? `<div class="sheet-head"><h2>선생님께 보내기</h2><p>${live ? "위 파트 활동에 쓴 내용이 선생님 화면에 보여요. 교실 링크 참여 코드와 반·번호·모둠을 써요." : "위 파트 활동에 쓴 내용을 그림으로 저장해 선생님께 보내요."}</p></div>` : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? (live ? "여기에 바로 써요. 쓴 내용은 이 기기에 저장되고, 교실 링크 참여 코드를 넣으면 선생님 화면에도 바로 보여요." : "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.") : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
       ${opts.readonly ? "" : `<div class="sheet-me">
         <label>6학년 <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="반"> 반</label>
         <label><input type="text" data-me="no" value="${esc(me.no ?? "")}" inputmode="numeric" aria-label="번호"> 번</label>
@@ -1590,7 +1634,7 @@ function sheetHtml(lesson, opts = {}) {
       <div class="sheet-tools">
         ${live ? `<button class="btn-primary" type="button" data-sheet-submit>${icon.right}선생님께 제출</button>` : ""}
         <button class="${live ? "btn-ghost" : "btn-primary"}" type="button" data-sheet-save>${icon.download}활동지 그림으로 저장</button>
-        <button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>
+        ${opts.partsPanel ? "" : `<button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>`}
         <span class="sheet-status" aria-live="polite"></span>
       </div>
       <p class="notes-help">${live ? "제출하면 선생님 화면에 \"제출\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요." : "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요."}</p>`}
