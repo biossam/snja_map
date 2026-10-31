@@ -39,6 +39,7 @@ const icon = {
   screen: svg('<rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M8 21h8"/><path d="M12 17v4"/>'),
   left: svg('<path d="m15 18-6-6 6-6"/>', 28),
   right: svg('<path d="m9 18 6-6-6-6"/>', 28),
+  check: svg('<path d="m5 12 5 5 9-10"/>'),
   close: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 24),
   arrow: svg('<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>', 18),
   external: svg('<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>', 16),
@@ -1618,7 +1619,7 @@ function sheetHtml(lesson, opts = {}) {
   const live = Boolean(LIVE.url) && isStudent;
   return `
     <section class="sheet${opts.big ? " is-big" : ""}${opts.readonly ? " is-readonly" : ""}" aria-label="${esc(sh.title || "활동지")}">
-      ${opts.big || opts.readonly ? "" : opts.partsPanel ? `<div class="sheet-head"><h2>선생님께 보내기</h2><p>${live ? "위 파트 활동에 쓴 내용이 선생님 화면에 보여요. 교실 링크 참여 코드와 반·번호·모둠을 써요." : "위 파트 활동에 쓴 내용을 그림으로 저장해 선생님께 보내요."}</p></div>` : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? (live ? "여기에 바로 써요. 쓴 내용은 이 기기에 저장되고, 교실 링크 참여 코드를 넣으면 선생님 화면에도 바로 보여요." : "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.") : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
+      ${opts.big || opts.readonly ? "" : opts.partsPanel ? `<div class="sheet-head"><h2>${live ? "선생님과 연결" : "선생님께 보내기"}</h2><p>${live ? "교실 링크 참여 코드와 반·번호·모둠을 쓰면, 위 파트 활동에 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요." : "위 파트 활동에 쓴 내용을 그림으로 저장해 선생님께 보내요."}</p></div>` : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? (live ? "여기에 바로 써요. 교실 링크 참여 코드와 반·번호를 쓰면, 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요." : "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.") : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
       ${opts.readonly ? "" : `<div class="sheet-me">
         <label>6학년 <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="반"> 반</label>
         <label><input type="text" data-me="no" value="${esc(me.no ?? "")}" inputmode="numeric" aria-label="번호"> 번</label>
@@ -1632,12 +1633,12 @@ function sheetHtml(lesson, opts = {}) {
       ${parts}
       ${opts.readonly ? "" : `<div class="sheet-progress" data-sheet-progress aria-live="polite"></div>
       <div class="sheet-tools">
-        ${live ? `<button class="btn-primary" type="button" data-sheet-submit>${icon.right}선생님께 제출</button>` : ""}
+        ${live ? `<button class="btn-primary" type="button" data-sheet-submit>${icon.check}다 했어요</button>` : ""}
         <button class="${live ? "btn-ghost" : "btn-primary"}" type="button" data-sheet-save>${icon.download}활동지 그림으로 저장</button>
         ${opts.partsPanel ? "" : `<button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>`}
         <span class="sheet-status" aria-live="polite"></span>
       </div>
-      <p class="notes-help">${live ? "제출하면 선생님 화면에 \"제출\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요." : "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요."}</p>`}
+      <p class="notes-help">${live ? "<b>다 했어요</b>를 누르면 선생님 화면에 \"다 했어요 ✓\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요." : "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요."}</p>`}
     </section>`;
 }
 
@@ -1815,7 +1816,7 @@ async function liveSync(lesson, submit = false) {
   const w = liveWho();
   if (!w.ready) {
     liveChip(w.room ? "반·번호를 써요" : "참여 코드를 써요", false);
-    if (submit) alert("선생님께 보내려면 반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.");
+    if (submit) alert("반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.");
     return;
   }
   const st = sheetState(lesson);
@@ -1830,12 +1831,12 @@ async function liveSync(lesson, submit = false) {
     LIVE.connected = true;
     if (r.gfields) applyGroup(lesson, r.gfields);
     receivePoints(r.points);
-    liveChip(r.submitted ? "제출함 ✓" : "선생님께 연결됨", true);
-    if (submit) { alert("선생님께 제출했어요!"); earnSheetBadge(lesson); }
+    liveChip(r.submitted ? "다 했어요 ✓" : "선생님과 연결됨 · 자동 저장 중", true);
+    if (submit) { alert("다 했어요! 선생님께 알렸어요."); earnSheetBadge(lesson); }
   } catch (err) {
     LIVE.connected = false;
     liveChip("연결 안 됨", false);
-    if (submit) alert(`제출하지 못했어요. ${err.message}\n그림으로 저장해 두세요.`);
+    if (submit) alert(`선생님께 알리지 못했어요. ${err.message}\n그림으로 저장해 두세요.`);
   }
 }
 
@@ -1890,7 +1891,7 @@ function sheetLeft(lesson) {
   return sheetProgress(lesson).map(([d, n], pi) => (d < n ? `${lesson.sheet.parts[pi].title} (${n - d}칸 남음)` : "")).filter(Boolean);
 }
 
-// 활동지 아래 진행 막대. 다 채우면 "선생님께 보내기"를 크게 알려 줌
+// 활동지 아래 진행 막대. 다 채우면 "다 했어요"를 크게 알려 줌
 function paintSheetProgress(lesson, box) {
   const el = box.querySelector("[data-sheet-progress]");
   if (!el) return;
@@ -1902,7 +1903,7 @@ function paintSheetProgress(lesson, box) {
   el.innerHTML = `
     <div class="sp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
     <p>${full
-      ? `🎉 활동지를 다 채웠어요! ${live ? "아래 <b>선생님께 제출</b>을 눌러 보내요." : "그림으로 저장해 선생님께 보내요."}`
+      ? `🎉 활동지를 다 채웠어요! ${live ? "아래 <b>다 했어요</b>를 눌러요." : "그림으로 저장해 선생님께 보내요."}`
       : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
   box.querySelector("[data-sheet-submit]")?.classList.toggle("is-ready", full);
   box.querySelector("[data-sheet-save]")?.classList.toggle("is-ready", full && !live);
@@ -2196,14 +2197,14 @@ function renderLive(no) {
     const subm = list.filter((x) => x.submitted).length;
     const active = list.filter((x) => (data.now - x.t) < 60000).length;
     app.querySelector("[data-summary]").innerHTML = `
-      <span><b>${list.length}</b>명 들어옴</span><span><b>${active}</b>명 지금 쓰는 중</span><span><b>${subm}</b>명 제출</span>`;
+      <span><b>${list.length}</b>명 들어옴</span><span><b>${active}</b>명 지금 쓰는 중</span><span><b>${subm}</b>명 다 했어요</span>`;
     app.querySelector("[data-table]").innerHTML = list.length ? `
-      <thead><tr><th>모둠</th><th>반-번호</th>${parts.map((p, pi) => `<th>${esc(p.title)}${groupParts().includes(pi) ? " <small>(모둠)</small>" : ""}</th>`).join("")}<th>마지막 입력</th><th>제출</th>${pts.length ? "<th>칭찬포인트</th>" : ""}</tr></thead>
+      <thead><tr><th>모둠</th><th>반-번호</th>${parts.map((p, pi) => `<th>${esc(p.title)}${groupParts().includes(pi) ? " <small>(모둠)</small>" : ""}</th>`).join("")}<th>마지막 입력</th><th>다 했어요</th>${pts.length ? "<th>칭찬포인트</th>" : ""}</tr></thead>
       <tbody>${list.map((x) => `<tr data-sid="${esc(x.sid)}" tabindex="0">
         <td>${esc(x.group || "-")}</td><th scope="row">${esc(x.ban)}-${esc(x.no)}</th>
         ${parts.map((p, pi) => `<td>${bar(x.progress?.[pi] ?? [0, 0])}</td>`).join("")}
         <td class="${(data.now - x.t) < 60000 ? "is-live" : ""}">${ago(x.t)}</td>
-        <td>${x.submitted ? `<span class="ok">제출 ✓</span>` : ""}</td>
+        <td>${x.submitted ? `<span class="ok">✓</span>` : ""}</td>
         ${pts.length ? `<td class="pt-cell">${givenHere(x).map((g) => pointImg(pointById(g), "pt-mini")).join("")}${(() => { const rec = recommendPoints(lesson, x.fields || {}).filter((id) => !givenHere(x).includes(id)); return rec.length ? `<span class="pt-rec">추천 ${rec.length}</span>` : ""; })()}</td>` : ""}</tr>`).join("")}</tbody>`
       : `<caption class="status">아직 들어온 학생이 없어요. 오른쪽 주소나 QR로 학생 화면을 열게 해 주세요.</caption>`;
     const groups = Object.keys(data.groups ?? {}).sort((a, b) => Number(a) - Number(b));
@@ -2288,7 +2289,7 @@ function renderLive(no) {
     const per = data.students.map((x) => ({ x, ans: new Map(sheetAnswers(lesson, x.fields || {}).map((a) => [a.q, a.a])) }));
     const qs = [];
     per.forEach(({ ans }) => ans.forEach((_, q) => { if (!qs.includes(q)) qs.push(q); }));
-    const rows = [["반", "번호", "모둠", "제출", ...(pts.length ? ["칭찬포인트(이 차시)"] : []), ...qs]];
+    const rows = [["반", "번호", "모둠", "다 했어요", ...(pts.length ? ["칭찬포인트(이 차시)"] : []), ...qs]];
     per.forEach(({ x, ans }) => rows.push([x.ban, x.no, x.group, x.submitted ? new Date(x.submitted).toLocaleString("ko-KR") : "",
       ...(pts.length ? [givenHere(x).map((g) => pointById(g)?.name ?? g).join(", ")] : []), ...qs.map((q) => ans.get(q) ?? "")]));
     const csv = "\ufeff" + rows.map((r) => r.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
