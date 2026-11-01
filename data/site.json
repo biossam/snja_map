@@ -28,10 +28,16 @@
       "file": "data/courses/artist.json"
     },
     {
-      "id": "intl",
+      "id": "intl-th",
       "grade": 6,
-      "title": "국제 교류",
-      "file": "data/courses/intl.json"
+      "title": "국제 교류 · 태국",
+      "file": "data/courses/intl-th.json"
+    },
+    {
+      "id": "intl-jp",
+      "grade": 6,
+      "title": "국제 교류 · 일본",
+      "file": "data/courses/intl-jp.json"
     }
   ]
 }
