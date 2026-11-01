@@ -67,7 +67,7 @@ const fileVideo = (v, attrs = "") => `<video${attrs} src="${esc(vidFile(v))}"${v
 
 function teacherFileCount(lesson) {
   const t = lesson.teacher ?? {};
-  return [t.worksheet, t.ppt].filter(Boolean).length;
+  return [t.worksheet, t.ppt, t.plan].filter(Boolean).length;
 }
 
 /* ---------- 배지 모으기 (학생용 화면만) ----------
@@ -495,9 +495,12 @@ function teacherSection(lesson) {
   const t = lesson.teacher ?? {};
   // course.noWorksheet: 활동지가 없는 교재는 활동지 칸을 보여 주지 않음
   // course.platformOnly: 지도안·PPT·활동지를 사이트에서 직접 주지 않고 외부 플랫폼으로만 안내
+  // course.webSheetOnly: 활동지는 웹으로만 쓰고 파일로 주지 않음. t.plan: 수업 지도안 파일
+  // t.noPpt: PPT 원본을 나누지 않는 차시(작품 사진 저작권 등)
   const files = course.noWorksheet || course.platformOnly ? [] : [
-    ...(t.ppt || lesson.slides ? [{ label: "수업 PPT", url: t.ppt, kind: "PowerPoint" }] : []),
-    { label: "수업 활동지", url: t.worksheet, kind: "Word" },
+    ...(t.plan ? [{ label: "수업 지도안", url: t.plan, kind: "Word" }] : []),
+    ...((t.ppt || lesson.slides) && !t.noPpt ? [{ label: "수업 PPT", url: t.ppt, kind: "PowerPoint" }] : []),
+    ...(course.webSheetOnly && !t.worksheet ? [] : [{ label: "수업 활동지", url: t.worksheet, kind: "Word" }]),
   ];
   const items = files.map((f) => {
     const url = safeUrl(f.url);

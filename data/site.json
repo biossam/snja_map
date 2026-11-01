@@ -26,6 +26,12 @@
       "title": "어느 날 눈떠보니 예술가가 되었다",
       "tab": "어느 날 눈떠보니 예술가",
       "file": "data/courses/artist.json"
+    },
+    {
+      "id": "intl",
+      "grade": 6,
+      "title": "국제 교류",
+      "file": "data/courses/intl.json"
     }
   ]
 }
