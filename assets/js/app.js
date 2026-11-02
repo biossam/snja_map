@@ -593,7 +593,7 @@ function renderLesson(unitId, no, pick = 0) {
       <div class="lesson-title${isStudent && lesson.badge && !isEarned(cid, unit, lesson) ? " not-earned" : ""}">
         ${badgeImg(lesson, "lesson-badge")}
         <div>
-          <p class="lesson-kicker">${UI === "th" ? `คาบที่ ${lesson.no}` : `${lesson.no}${LW()}`}${lesson.stage ? ` <span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}${lesson.pages ? ` <span class="pages">${esc(lesson.pages)}</span>` : ""}</p>
+          <p class="lesson-kicker">${lesson.kicker && !isStudent ? esc(lesson.kicker) : UI === "th" ? `คาบที่ ${lesson.no}` : UI === "ja" ? `${lesson.no}時間目` : `${lesson.no}${LW()}`}${lesson.stage ? ` <span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}${lesson.pages ? ` <span class="pages">${esc(lesson.pages)}</span>` : ""}</p>
           <h1>${esc(sv("title"))}</h1>
           ${sv("topic") ? `<p class="lesson-topic">${esc(sv("topic"))}</p>` : ""}
           ${badgeNote(unit, lesson)}
@@ -1418,6 +1418,22 @@ const UI_DICT = {
     "활동지를 다 채웠어요!": "เขียนครบทุกช่องแล้ว!", "아래 <b>다 했어요</b>를 눌러요.": "กด <b>เสร็จแล้ว</b> ด้านล่าง", "그림으로 저장해 선생님께 보내요.": "บันทึกเป็นรูปภาพแล้วส่งให้คุณครู",
   },
 };
+UI_DICT.ja = {
+  "PPT": "スライド", "활동지": "ワークシート", "활동 안내": "活動の案内", "학습 목표": "めあて",
+  "써 보세요.": "ここに書きましょう", "점검할 내용": "チェックすること", "번": "",
+  "6학년": "6年", "반": "組", "번호": "番号", "모둠": "グループ", "이름": "名前", "참여 코드": "参加コード",
+  "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.": "ここに直接書きましょう。書いた内容はこの端末に自動で保存されます。",
+  "여기에 바로 써요. 교실 링크 참여 코드와 반·번호를 쓰면, 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요.": "ここに直接書きましょう。参加コードと組・番号を入れると、書いた内容が先生の画面に自動で届きます。終わったら <b>できた！</b> を押しましょう。",
+  "이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.": "名前はこの端末にだけ残り、先生には組・番号・グループと書いた内容だけが届きます。",
+  "다 했어요": "できた！", "활동지 그림으로 저장": "ワークシートを画像で保存", "다 지우기": "すべて消す",
+  "<b>다 했어요</b>를 누르면 선생님 화면에 \"다 했어요 ✓\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요.": "<b>できた！</b> を押すと先生の画面に ✓ が表示されます。画像で保存して提出することもできます。",
+  "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요.": "画像で保存して先生に提出しましょう。",
+  "연결 안 됨": "未接続", "보내는 중…": "送信中…", "선생님과 연결됨 · 자동 저장 중": "先生とつながっています · 自動保存中",
+  "다 했어요 ✓": "できた ✓", "반·번호를 써요": "組と番号を入れてください", "참여 코드를 써요": "参加コードを入れてください", "다른 기기에서 쓰는 번호예요": "この番号はほかの端末で使われています",
+  "반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.": "先に組・番号・参加コードを入れてください。",
+  "다 했어요! 선생님께 알렸어요.": "できた！先生に知らせました。",
+  "활동지를 다 채웠어요!": "全部書けました！", "아래 <b>다 했어요</b>를 눌러요.": "下の <b>できた！</b> を押しましょう。", "그림으로 저장해 선생님께 보내요.": "画像で保存して先生に送りましょう。",
+};
 const tr = (ko) => (UI !== "ko" && UI_DICT[UI]?.[ko] !== undefined ? UI_DICT[UI][ko] : ko);
 
 async function route() {
@@ -2000,7 +2016,7 @@ function paintSheetProgress(lesson, box) {
     <div class="sp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
     <p>${full
       ? `🎉 ${tr("활동지를 다 채웠어요!")} ${live ? tr("아래 <b>다 했어요</b>를 눌러요.") : tr("그림으로 저장해 선생님께 보내요.")}`
-      : UI === "th" ? `เขียนแล้ว <b>${done}</b> จาก ${total} ช่อง` : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
+      : UI === "th" ? `เขียนแล้ว <b>${done}</b> จาก ${total} ช่อง` : UI === "ja" ? `${total}こ中 <b>${done}</b>こ書きました` : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
   box.querySelector("[data-sheet-submit]")?.classList.toggle("is-ready", full);
   box.querySelector("[data-sheet-save]")?.classList.toggle("is-ready", full && !live);
 }
