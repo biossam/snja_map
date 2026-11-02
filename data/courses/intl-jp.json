@@ -62,7 +62,19 @@
      ],
      "teacher": {
       "plan": "files/intl/AI시대_미술_지도안.docx",
-      "noPpt": true
+      "noPpt": true,
+      "files": [
+       {
+        "label": "指導案 (일본어 지도안)",
+        "url": "files/intl/AI時代_美術_指導案_日本語.pdf",
+        "kind": "PDF"
+       },
+       {
+        "label": "PPT 翻訳 (일본어 PPT 글)",
+        "url": "files/intl/AI時代_美術_PPT_日本語.pdf",
+        "kind": "PDF"
+       }
+      ]
      },
      "slides": {
       "dir": "assets/slides/intl/jp1",
@@ -225,7 +237,19 @@
      ],
      "teacher": {
       "plan": "files/intl/AI시대_미술_지도안.docx",
-      "noPpt": true
+      "noPpt": true,
+      "files": [
+       {
+        "label": "指導案 (일본어 지도안)",
+        "url": "files/intl/AI時代_美術_指導案_日本語.pdf",
+        "kind": "PDF"
+       },
+       {
+        "label": "PPT 翻訳 (일본어 PPT 글)",
+        "url": "files/intl/AI時代_美術_PPT_日本語.pdf",
+        "kind": "PDF"
+       }
+      ]
      },
      "slides": {
       "dir": "assets/slides/intl/jp2",

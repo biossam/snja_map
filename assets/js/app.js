@@ -67,7 +67,7 @@ const fileVideo = (v, attrs = "") => `<video${attrs} src="${esc(vidFile(v))}"${v
 
 function teacherFileCount(lesson) {
   const t = lesson.teacher ?? {};
-  return [t.worksheet, t.ppt, t.plan].filter(Boolean).length;
+  return [t.worksheet, t.ppt, t.plan, ...(Array.isArray(t.files) ? t.files : [])].filter(Boolean).length;
 }
 
 /* ---------- 배지 모으기 (학생용 화면만) ----------
@@ -498,9 +498,11 @@ function teacherSection(lesson) {
   // course.webSheetOnly: 활동지는 웹으로만 쓰고 파일로 주지 않음. t.plan: 수업 지도안 파일
   // t.noPpt: PPT 원본을 나누지 않는 차시(작품 사진 저작권 등)
   const files = course.noWorksheet || course.platformOnly ? [] : [
-    ...(t.plan ? [{ label: "수업 지도안", url: t.plan, kind: "Word" }] : []),
+    ...(t.plan ? [{ label: "수업 지도안", url: t.plan, kind: /\.pdf$/i.test(t.plan) ? "PDF" : "Word" }] : []),
     ...((t.ppt || lesson.slides) && !t.noPpt ? [{ label: "수업 PPT", url: t.ppt, kind: "PowerPoint" }] : []),
     ...(course.webSheetOnly && !t.worksheet ? [] : [{ label: "수업 활동지", url: t.worksheet, kind: "Word" }]),
+    // t.files: 그 밖의 자료 [{label, url, kind}] (예: 일본어 지도안 PDF)
+    ...(Array.isArray(t.files) ? t.files : []),
   ];
   const items = files.map((f) => {
     const url = safeUrl(f.url);
@@ -570,7 +572,7 @@ function renderLesson(unitId, no, pick = 0) {
   // 한 화면에 한 가지만: 수업 자료(PPT·영상) / 활동지 / 수업 안내 / 선생님 자료를 탭으로 나눔
   const media = [
     deck,
-    videos && !(deck && lesson.slides?.videos?.length) ? `<div class="videos">${videos}</div>` : deck ? "" : `<p class="empty-note">수업 영상은 준비 중입니다.</p>`,
+    videos && !(deck && lesson.slides?.videos?.length) ? `<div class="videos">${videos}</div>` : "",
     artistSection(lesson),
     figuresSection(lesson),
     lesson.partsSheet && isStudent ? sheetHtml(lesson, { partsPanel: true }) : "",
@@ -593,7 +595,7 @@ function renderLesson(unitId, no, pick = 0) {
       <div class="lesson-title${isStudent && lesson.badge && !isEarned(cid, unit, lesson) ? " not-earned" : ""}">
         ${badgeImg(lesson, "lesson-badge")}
         <div>
-          <p class="lesson-kicker">${lesson.kicker && !isStudent ? esc(lesson.kicker) : UI === "th" ? `คาบที่ ${lesson.no}` : UI === "ja" ? `${lesson.no}時間目` : `${lesson.no}${LW()}`}${lesson.stage ? ` <span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}${lesson.pages ? ` <span class="pages">${esc(lesson.pages)}</span>` : ""}</p>
+          <p class="lesson-kicker">${lesson.kicker && !isStudent ? esc(lesson.kicker) : UI === "th" ? `คาบที่ ${lesson.no}` : UI === "ja" ? `${lesson.no}時間目` : UI === "en" ? `Lesson ${lesson.no}` : `${lesson.no}${LW()}`}${lesson.stage ? ` <span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}${lesson.pages ? ` <span class="pages">${esc(lesson.pages)}</span>` : ""}</p>
           <h1>${esc(sv("title"))}</h1>
           ${sv("topic") ? `<p class="lesson-topic">${esc(sv("topic"))}</p>` : ""}
           ${badgeNote(unit, lesson)}
@@ -1434,6 +1436,22 @@ UI_DICT.ja = {
   "다 했어요! 선생님께 알렸어요.": "できた！先生に知らせました。",
   "활동지를 다 채웠어요!": "全部書けました！", "아래 <b>다 했어요</b>를 눌러요.": "下の <b>できた！</b> を押しましょう。", "그림으로 저장해 선생님께 보내요.": "画像で保存して先生に送りましょう。",
 };
+UI_DICT.en = {
+  "PPT": "Slides", "활동지": "Worksheet", "활동 안내": "Guide", "학습 목표": "Goal",
+  "써 보세요.": "Write here", "점검할 내용": "Check", "번": "",
+  "6학년": "Grade 6", "반": "Class", "번호": "No.", "모둠": "Group", "이름": "Name", "참여 코드": "Room code",
+  "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.": "Write here. Your answers are saved on this device automatically.",
+  "여기에 바로 써요. 교실 링크 참여 코드와 반·번호를 쓰면, 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요.": "Write here. Enter the room code, class and number, and your answers go to your teacher automatically. When you finish, press <b>Done!</b>",
+  "이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.": "Your name stays on this device. Your teacher only sees your class, number, group and answers.",
+  "다 했어요": "Done!", "활동지 그림으로 저장": "Save as image", "다 지우기": "Clear all",
+  "<b>다 했어요</b>를 누르면 선생님 화면에 \"다 했어요 ✓\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요.": "Press <b>Done!</b> and your teacher will see ✓. You can also save it as an image.",
+  "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요.": "Save it as an image and send it to your teacher.",
+  "연결 안 됨": "Not connected", "보내는 중…": "Sending…", "선생님과 연결됨 · 자동 저장 중": "Connected · auto-saving",
+  "다 했어요 ✓": "Done ✓", "반·번호를 써요": "Enter class and number", "참여 코드를 써요": "Enter the room code", "다른 기기에서 쓰는 번호예요": "This number is used on another device",
+  "반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.": "Please enter your class, number and room code first.",
+  "다 했어요! 선생님께 알렸어요.": "Done! Your teacher has been told.",
+  "활동지를 다 채웠어요!": "You filled in everything!", "아래 <b>다 했어요</b>를 눌러요.": "Press <b>Done!</b> below.", "그림으로 저장해 선생님께 보내요.": "Save it as an image and send it to your teacher.",
+};
 const tr = (ko) => (UI !== "ko" && UI_DICT[UI]?.[ko] !== undefined ? UI_DICT[UI][ko] : ko);
 
 async function route() {
@@ -2016,7 +2034,7 @@ function paintSheetProgress(lesson, box) {
     <div class="sp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
     <p>${full
       ? `🎉 ${tr("활동지를 다 채웠어요!")} ${live ? tr("아래 <b>다 했어요</b>를 눌러요.") : tr("그림으로 저장해 선생님께 보내요.")}`
-      : UI === "th" ? `เขียนแล้ว <b>${done}</b> จาก ${total} ช่อง` : UI === "ja" ? `${total}こ中 <b>${done}</b>こ書きました` : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
+      : UI === "th" ? `เขียนแล้ว <b>${done}</b> จาก ${total} ช่อง` : UI === "ja" ? `${total}こ中 <b>${done}</b>こ書きました` : UI === "en" ? `<b>${done}</b> of ${total} written` : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
   box.querySelector("[data-sheet-submit]")?.classList.toggle("is-ready", full);
   box.querySelector("[data-sheet-save]")?.classList.toggle("is-ready", full && !live);
 }

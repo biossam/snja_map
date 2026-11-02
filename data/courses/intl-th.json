@@ -1,7 +1,7 @@
 {
  "course": {
   "title": "국제 교류 · 태국",
-  "tagline": "한-태 교류: 세계시민교육 4차시와 상상력 씨앗 릴레이 2차시",
+  "tagline": "한-태 교류: 세계시민교육 4차시(WHO–WHY–WHAT–NOW)와 상상력 씨앗 릴레이 2차시",
   "subject": "미술",
   "grade": "초등 6학년",
   "author": "장혜림",
@@ -9,7 +9,8 @@
   "keyLabel": "학습 문제",
   "slideCourse": true,
   "credits": [
-   "수업 PPT: 한국 학생용·태국 학생용 씨앗 편지"
+   "수업 PPT: 한국 학생용·태국 학생용 씨앗 편지",
+   "그림책: 『자, 맡겨주세요!』(이소영), 『플라스틱 섬』(이명애), 『빨간 지구 만들기 초록 지구 만들기』(한성민) — 그림책 장면은 사이트에 올리지 않았어요."
   ],
   "license": {
    "name": "CC BY-NC 4.0",
@@ -20,6 +21,388 @@
   "webSheetOnly": true
  },
  "units": [
+  {
+   "id": "gc",
+   "title": "세계시민교육 Global Citizenship Project (WHO → WHY → WHAT → NOW)",
+   "lessons": [
+    {
+     "no": 1,
+     "title": "Who is in trouble?",
+     "topic": "멸종위기 동물에 공감하기 (WHO) · 그림책 『자, 맡겨주세요!』",
+     "date": "2026.4.1",
+     "color": {
+      "name": "숲",
+      "hex": "#4C9A6A",
+      "ink": "#0B0B2E"
+     },
+     "goal": "멸종위기 동물에 관심을 가지고 환경 문제에 공감하며, \"I want to help ~ / It is in danger.\"로 자기 생각을 말할 수 있다.",
+     "student": {
+      "title": "Who is in trouble?",
+      "topic": "Many animals are in trouble. Who needs help?",
+      "goal": "I can say which animal I want to help and why, in simple English."
+     },
+     "materials": [
+      "그림책 『자, 맡겨주세요!』 (이소영)",
+      "클레이",
+      "멸종위기 동물 조사 자료"
+     ],
+     "steps": [
+      "도입: \"Today, we will read a story. Many animals are in trouble. Who needs help?\" 감정 질문 \"How do you feel?\"",
+      "활동 1 그림책 함께 읽기: 곰, 올빼미, 거북이, 고래가 문제를 가지고 찾아오는 장면을 보며 \"Who is in trouble?\"",
+      "활동 2 멸종위기 동물 조사하고 클레이로 만들기: \"Which animal do you want to help? Let's make that animal with clay.\"",
+      "활동 3 내가 도와주고 싶은 멸종위기 동물: \"I want to help a ( ) because it is in danger.\" 발표",
+      "국제 비교 (한국·태국): \"Is this happening in Korea? What about Thailand?\" → \"It is everyone's problem.\"",
+      "정리: 다음 차시 예고 \"But… why are they suffering?\""
+     ],
+     "questions": [
+      "Who is in trouble?",
+      "How do you feel?",
+      "Is this only animals' problem?"
+     ],
+     "prep": [
+      "설명보다 질문 중심으로 진행해요.",
+      "학생 결과물을 작품이 아니라 '도움이 필요한 존재'로 바라보게 해요.",
+      "평가: 관찰평가, 수행평가(결과물)"
+     ],
+     "sheet": {
+      "title": "Lesson 1 Worksheet",
+      "parts": [
+       {
+        "title": "Who is in trouble?",
+        "items": [
+         {
+          "type": "text",
+          "label": "Which animal in the story is in trouble? What is its problem?",
+          "lines": 2
+         },
+         {
+          "type": "text",
+          "label": "How do you feel?",
+          "lines": 1
+         }
+        ]
+       },
+       {
+        "title": "My animal",
+        "items": [
+         {
+          "type": "fill",
+          "text": "I want to help a {} because it is in danger."
+         },
+         {
+          "type": "text",
+          "label": "What did you make with clay?",
+          "lines": 1
+         }
+        ]
+       },
+       {
+        "title": "Korea and Thailand",
+        "items": [
+         {
+          "type": "text",
+          "label": "Is this happening in Korea? What about Thailand?",
+          "lines": 2
+         },
+         {
+          "type": "choice",
+          "label": "Is this only animals' problem?",
+          "options": [
+           "Yes, it is.",
+           "No, it is everyone's problem."
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     "lang": "en",
+     "teacher": {}
+    },
+    {
+     "no": 2,
+     "title": "Why are they suffering?",
+     "topic": "문제의 원인 찾기 (WHY) · 그림책 『플라스틱 섬』",
+     "date": "2026.4.2",
+     "color": {
+      "name": "바다",
+      "hex": "#3F8FC4",
+      "ink": "#0B0B2E"
+     },
+     "goal": "환경 문제의 원인이 인간의 행동과 관계있음을 이해하고, \"This happens because ~\"로 원인을 설명할 수 있다.",
+     "student": {
+      "title": "Why are they suffering?",
+      "topic": "Is this natural, or is this made by people?",
+      "goal": "I can explain why animals are suffering with \"This happens because ~\"."
+     },
+     "materials": [
+      "그림책 『플라스틱 섬』 (이명애)",
+      "바다 유리(씨글라스), 키링 재료"
+     ],
+     "steps": [
+      "도입: \"Animals are in trouble. They need help. But… why?\"",
+      "활동 1 그림책 함께 읽기: 바다에 떠다니는 쓰레기, 동물과 플라스틱의 관계. \"Is this natural OR is this made by people?\" → \"People made it.\"",
+      "활동 2 바다 유리로 키링 만들기: \"This is sea glass. It was trash.\" \"Where did it come from?\" → \"It was in the ocean.\"",
+      "활동 3 내가 만든 키링은 아름답지만 ( ): \"This happens because people use too much plastic.\"",
+      "한국·태국: \"Do you see trash in Korea? What about Thailand?\"",
+      "정리: \"This is not just trash. This is our problem.\" 다음 차시 예고 \"What can we do?\""
+     ],
+     "questions": [
+      "What do you see?",
+      "Is this natural or made by people?",
+      "Why is there so much trash?"
+     ],
+     "prep": [
+      "그림 일부를 보여 주며 질문으로 호기심을 열어요.",
+      "평가: 관찰평가, 수행평가(과제물)"
+     ],
+     "sheet": {
+      "title": "Lesson 2 Worksheet",
+      "parts": [
+       {
+        "title": "What do you see?",
+        "items": [
+         {
+          "type": "text",
+          "label": "What do you see in the ocean?",
+          "lines": 2
+         },
+         {
+          "type": "choice",
+          "label": "Is this natural, or is this made by people?",
+          "options": [
+           "Natural",
+           "Made by people"
+          ]
+         }
+        ]
+       },
+       {
+        "title": "Sea glass keyring",
+        "items": [
+         {
+          "type": "fill",
+          "text": "This is beautiful, but {}."
+         },
+         {
+          "type": "text",
+          "label": "Where did it come from?",
+          "lines": 1
+         }
+        ]
+       },
+       {
+        "title": "Why?",
+        "items": [
+         {
+          "type": "fill",
+          "text": "This happens because people {}."
+         },
+         {
+          "type": "text",
+          "label": "Do you see trash in Korea? What about Thailand?",
+          "lines": 2
+         }
+        ]
+       }
+      ]
+     },
+     "lang": "en",
+     "teacher": {}
+    },
+    {
+     "no": 3,
+     "title": "What should we do?",
+     "topic": "해결 방법 고르기 (WHAT) · 그림책 『빨간 지구 만들기 초록 지구 만들기』",
+     "date": "2026.4.2",
+     "color": {
+      "name": "새싹",
+      "hex": "#7CB342",
+      "ink": "#0B0B2E"
+     },
+     "goal": "환경 문제를 해결하는 방법을 이해하고, \"We can ~ / We should ~\"로 해결 방법을 제안할 수 있다.",
+     "student": {
+      "title": "What should we do?",
+      "topic": "Red Earth or green Earth? Our choice changes the Earth.",
+      "goal": "I can suggest ways to help the Earth with \"We can ~ / We should ~\"."
+     },
+     "materials": [
+      "그림책 『빨간 지구 만들기 초록 지구 만들기』 (한성민)",
+      "태블릿 · 누구지 앱(한국어·영어·태국어)"
+     ],
+     "steps": [
+      "도입: \"This is our problem. So… what can we do?\"",
+      "활동 1 그림책 함께 읽기: \"What can we do?\" → \"We can recycle.\" \"How can we help the Earth?\" → \"We can use less plastic.\"",
+      "활동 2 빨간 vs 초록 지구 만들기: \"What is happening on the red Earth? What is different on the green Earth?\" [태블릿] 누구지: 멸종위기 동물 30마리를 살릴 30개 선택",
+      "활동 3 내가 선택한 지구는 ( ): \"Which Earth do you choose?\" Reduce · Reuse · Recycle · Change our behavior",
+      "한국·태국: \"What can we do in Korea? What can we do in Thailand?\"",
+      "정리: \"We can choose. Our choice changes the Earth.\" 다음 차시 예고 \"Will we really do it? When will we start?\""
+     ],
+     "questions": [
+      "What is happening on the red Earth?",
+      "Which Earth do you choose?",
+      "What can we do in Korea and Thailand?"
+     ],
+     "prep": [
+      "좋은 행동을 나열하기보다, 어떤 선택이 어떤 결과를 만드는지 비교하게 해요.",
+      "누구지 결과: 완벽한 수호자 · 훌륭한 실천가 · 위험한 타협 · 편리함의 대가",
+      "평가: 관찰평가, 수행평가(선택지 활동)"
+     ],
+     "sheet": {
+      "title": "Lesson 3 Worksheet",
+      "parts": [
+       {
+        "title": "Red Earth and green Earth",
+        "items": [
+         {
+          "type": "text",
+          "label": "What is happening on the red Earth?",
+          "lines": 2
+         },
+         {
+          "type": "text",
+          "label": "What is different on the green Earth?",
+          "lines": 2
+         }
+        ]
+       },
+       {
+        "title": "My choice",
+        "items": [
+         {
+          "type": "choice",
+          "label": "Which Earth do you choose?",
+          "options": [
+           "Red Earth",
+           "Green Earth"
+          ]
+         },
+         {
+          "type": "choice",
+          "label": "My result in the app",
+          "options": [
+           "Perfect Guardian (완벽한 수호자)",
+           "Great Doer (훌륭한 실천가)",
+           "Risky Compromise (위험한 타협)",
+           "Price of Convenience (편리함의 대가)"
+          ]
+         }
+        ]
+       },
+       {
+        "title": "What can we do?",
+        "items": [
+         {
+          "type": "fill",
+          "text": "We can {}."
+         },
+         {
+          "type": "fill",
+          "text": "We should {}."
+         },
+         {
+          "type": "text",
+          "label": "What can we do in Korea? What can we do in Thailand?",
+          "lines": 2
+         }
+        ]
+       }
+      ]
+     },
+     "lang": "en",
+     "teacher": {}
+    },
+    {
+     "no": 4,
+     "title": "Now, let's act.",
+     "topic": "실천 다짐하기 (NOW) · 세계 생태 시민 4컷",
+     "date": "2026.4.3",
+     "color": {
+      "name": "햇살",
+      "hex": "#F2B134",
+      "ink": "#0B0B2E"
+     },
+     "goal": "WHO–WHY–WHAT–NOW로 배운 것을 정리하고, \"I will ~ / I promise to ~\"로 실천 계획을 말할 수 있다.",
+     "student": {
+      "title": "Now, let's act.",
+      "topic": "WHO → WHY → WHAT → NOW: my 4-cut photo story",
+      "goal": "I can tell my action plan with \"I will ~ / I promise to ~\"."
+     },
+     "materials": [
+      "포토부스 앱(영어 문장 → 한국어·태국어 자동 번역)",
+      "태블릿"
+     ],
+     "steps": [
+      "도입: \"We can choose. Our choice changes the Earth. So… when will we start?\"",
+      "활동 1 프로젝트 돌아보기: \"Who is in trouble? Why are they suffering? What should we do?\"",
+      "활동 2 세계 생태 시민 4컷 문장 구성: 1컷 WHO(도움이 필요한 존재) · 2컷 WHY(문제 원인) · 3컷 WHAT(해결 방법) · 4컷 NOW(나의 다짐)",
+      "활동 3 4컷 촬영 및 공유: 한국과 태국 학생이 함께 촬영하고 4컷 사진을 교환해요. \"I will reduce plastic.\" \"I promise to help the Earth.\"",
+      "한국·태국: \"What will you do? Why is it important?\"",
+      "정리: \"Now, we act. Will you really do it?\" \"We will protect the Earth.\""
+     ],
+     "questions": [
+      "What will you do?",
+      "Why is it important?",
+      "Will you really do it?"
+     ],
+     "prep": [
+      "포토부스 앱에 영어 문장을 넣으면 한국어·태국어로 자동 번역돼요.",
+      "평가: 관찰평가, 수행평가(포토부스 촬영물, 영어 작문)"
+     ],
+     "sheet": {
+      "title": "Lesson 4 Worksheet",
+      "parts": [
+       {
+        "title": "My 4-cut story",
+        "note": "Write one sentence for each cut. Then type them into the photo booth app.",
+        "items": [
+         {
+          "type": "text",
+          "label": "WHO — Who is in trouble?",
+          "lines": 1
+         },
+         {
+          "type": "text",
+          "label": "WHY — Why are they suffering?",
+          "lines": 1
+         },
+         {
+          "type": "text",
+          "label": "WHAT — What should we do?",
+          "lines": 1
+         },
+         {
+          "type": "text",
+          "label": "NOW — What will I do?",
+          "lines": 1
+         }
+        ]
+       },
+       {
+        "title": "My promise",
+        "items": [
+         {
+          "type": "fill",
+          "text": "I will {}."
+         },
+         {
+          "type": "fill",
+          "text": "I promise to {}."
+         },
+         {
+          "type": "text",
+          "label": "Why is it important?",
+          "lines": 2
+         }
+        ]
+       }
+      ]
+     },
+     "lang": "en",
+     "teacher": {}
+    }
+   ]
+  },
   {
    "id": "seed",
    "title": "상상력 씨앗 릴레이",
