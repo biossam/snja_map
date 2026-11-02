@@ -175,6 +175,35 @@
            "Made by people"
           ]
          }
+        ],
+        "slides": [
+         2
+        ]
+       },
+       {
+        "title": "Fill in the blanks",
+        "slides": [
+         2,
+         4,
+         5
+        ],
+        "items": [
+         {
+          "type": "fill",
+          "text": "({}) made it."
+         },
+         {
+          "type": "fill",
+          "text": "The trash doesn't ({})."
+         },
+         {
+          "type": "fill",
+          "text": "It stays in the ({})."
+         },
+         {
+          "type": "fill",
+          "text": "This is ({}) glass. It was ({})."
+         }
         ]
        },
        {
@@ -189,6 +218,9 @@
           "label": "Where did it come from?",
           "lines": 1
          }
+        ],
+        "slides": [
+         7
         ]
        },
        {
@@ -203,12 +235,44 @@
           "label": "Do you see trash in Korea? What about Thailand?",
           "lines": 2
          }
+        ],
+        "slides": [
+         3,
+         8
         ]
        }
       ]
      },
      "lang": "en",
-     "teacher": {}
+     "teacher": {
+      "ppt": "files/intl/Why_are_they_suffering.pptx"
+     },
+     "slides": {
+      "dir": "assets/slides/intl/gc2",
+      "count": 9,
+      "titles": [
+       "Why are they suffering?",
+       "What do you see? Is this natural or made by people?",
+       "Plastic in the ocean · People throw trash · Too much plastic · Human behavior",
+       "The trash doesn't disappear. It stays in the ocean.",
+       "This is sea glass. It was trash.",
+       "What can we do? How can we help the Earth?",
+       "Let's make a keyring with sea glass.",
+       "How do you feel? Why is there so much trash?",
+       "Next time: What can we do?"
+      ],
+      "notes": [
+       "",
+       "“In Korea, we have air pollution.”\n“In Thailand, we have plastic waste.”",
+       "",
+       "“In Korea, we have air pollution.”\n“In Thailand, we have plastic waste.”",
+       "“In Korea, we have air pollution.”\n“In Thailand, we have plastic waste.”",
+       "“In Korea, we have air pollution.”\n“In Thailand, we have plastic waste.”",
+       "“In Korea, we have air pollution.”\n“In Thailand, we have plastic waste.”",
+       "“In Korea, we have air pollution.”\n“In Thailand, we have plastic waste.”",
+       ""
+      ]
+     }
     },
     {
      "no": 3,
