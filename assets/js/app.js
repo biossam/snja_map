@@ -541,6 +541,10 @@ function renderLesson(unitId, no, pick = 0) {
     return;
   }
   const { unit, lesson } = found;
+  UI = isStudent ? (lesson.lang || course.lang || "ko") : "ko";
+  // lesson.student: 학생 화면에서만 바꿔 보여 줄 제목·주제·목표 (예: 태국 학생에게는 태국어로)
+  const sv = (k) => (isStudent && lesson.student?.[k]) || lesson[k];
+  document.documentElement.lang = UI;
   const list = allLessons();
   const i = list.findIndex((x) => x.lesson === lesson);
   const prev = list[i - 1];
@@ -577,9 +581,9 @@ function renderLesson(unitId, no, pick = 0) {
     strategySection(lesson),
   ].join("");
   const panes = [
-    { id: "media", label: lesson.slides?.count ? "PPT" : "영상", html: media },
-    { id: "sheet", label: "활동지", html: lesson.partsSheet ? "" : sheetHtml(lesson) },
-    { id: "guide", label: isStudent ? "활동 안내" : "수업 안내", html: guide },
+    { id: "media", label: lesson.slides?.count ? tr("PPT") : "영상", html: media },
+    { id: "sheet", label: tr("활동지"), html: lesson.partsSheet ? "" : sheetHtml(lesson) },
+    { id: "guide", label: isStudent ? tr("활동 안내") : "수업 안내", html: guide },
     { id: "teacher", label: "선생님 자료", html: isStudent ? "" : teacherSection(lesson) },
   ].filter((x) => x.html && x.html.trim());
 
@@ -589,13 +593,13 @@ function renderLesson(unitId, no, pick = 0) {
       <div class="lesson-title${isStudent && lesson.badge && !isEarned(cid, unit, lesson) ? " not-earned" : ""}">
         ${badgeImg(lesson, "lesson-badge")}
         <div>
-          <p class="lesson-kicker">${lesson.no}${LW()}${lesson.stage ? ` <span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}${lesson.pages ? ` <span class="pages">${esc(lesson.pages)}</span>` : ""}</p>
-          <h1>${esc(lesson.title)}</h1>
-          ${lesson.topic ? `<p class="lesson-topic">${esc(lesson.topic)}</p>` : ""}
+          <p class="lesson-kicker">${UI === "th" ? `คาบที่ ${lesson.no}` : `${lesson.no}${LW()}`}${lesson.stage ? ` <span class="stage-chip" data-stage="${esc(lesson.stage[0])}">${esc(lesson.stage)}</span>` : ""}${lesson.pages ? ` <span class="pages">${esc(lesson.pages)}</span>` : ""}</p>
+          <h1>${esc(sv("title"))}</h1>
+          ${sv("topic") ? `<p class="lesson-topic">${esc(sv("topic"))}</p>` : ""}
           ${badgeNote(unit, lesson)}
         </div>
       </div>
-      ${lesson.goal ? `<p class="goal"><span>학습 목표</span>${esc(lesson.goal)}</p>` : ""}
+      ${sv("goal") ? `<p class="goal"><span>${tr("학습 목표")}</span>${esc(sv("goal"))}</p>` : ""}
       ${canClassMode ? `<span class="head-actions"><button class="btn-primary" id="class-mode" type="button">${icon.screen}수업 모드</button>${lesson.sheet && !isStudent ? `<a class="btn-ghost" href="${homeHref()}/live/${lesson.no}" target="_blank" rel="noopener">실시간 현황</a>` : ""}</span>` : ""}
     </header>
 
@@ -1392,7 +1396,32 @@ function renderQR() {
 //   #/c/{교재}/lesson/{단원}/{차시}[/v{영상}]
 //   #/c/{교재}/qr
 //   예전 주소(#/, #/lesson/…, #/qr)는 site.json의 default 교재(휴먼스킬아트)로 엽니다.
+/* ---------- 학생 화면 언어 (국제 교류: 태국·일본 학생) ----------
+   lesson.lang 또는 course.lang 이 "th"·"ja" 이면 학생 화면의 활동지 버튼·안내만 그 말로 보여 줌.
+   선생님 화면과 실시간 현황은 늘 한국어. 사전에 없는 말은 한국어 그대로. */
+let UI = "ko";
+const UI_DICT = {
+  th: {
+    "PPT": "สไลด์", "활동지": "ใบงาน", "활동 안내": "คำแนะนำ", "학습 목표": "จุดประสงค์การเรียนรู้",
+    "써 보세요.": "เขียนที่นี่", "점검할 내용": "รายการตรวจสอบ", "번": "",
+    "6학년": "ป.6", "반": "ห้อง", "번호": "เลขที่", "모둠": "กลุ่ม", "이름": "ชื่อ", "참여 코드": "รหัสห้องเรียน",
+    "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.": "เขียนที่นี่ได้เลย ข้อความจะบันทึกไว้ในเครื่องนี้โดยอัตโนมัติ",
+    "여기에 바로 써요. 교실 링크 참여 코드와 반·번호를 쓰면, 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요.": "เขียนที่นี่ได้เลย ใส่รหัสห้องเรียน ห้อง และเลขที่ แล้วสิ่งที่เขียนจะส่งถึงคุณครูโดยอัตโนมัติ เมื่อเสร็จแล้วกด <b>เสร็จแล้ว</b>",
+    "이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.": "ชื่อจะเก็บไว้ในเครื่องนี้เท่านั้น คุณครูจะเห็นเพียงห้อง เลขที่ กลุ่ม และสิ่งที่เขียน",
+    "다 했어요": "เสร็จแล้ว", "활동지 그림으로 저장": "บันทึกใบงานเป็นรูปภาพ", "다 지우기": "ลบทั้งหมด",
+    "<b>다 했어요</b>를 누르면 선생님 화면에 \"다 했어요 ✓\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요.": "กด <b>เสร็จแล้ว</b> แล้วคุณครูจะเห็นเครื่องหมาย ✓ หรือบันทึกเป็นรูปภาพเพื่อส่งคุณครูก็ได้",
+    "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요.": "บันทึกเป็นรูปภาพแล้วส่งให้คุณครู",
+    "연결 안 됨": "ยังไม่เชื่อมต่อ", "보내는 중…": "กำลังส่ง…", "선생님과 연결됨 · 자동 저장 중": "เชื่อมต่อกับคุณครูแล้ว · บันทึกอัตโนมัติ",
+    "다 했어요 ✓": "เสร็จแล้ว ✓", "반·번호를 써요": "ใส่ห้องและเลขที่", "참여 코드를 써요": "ใส่รหัสห้องเรียน", "다른 기기에서 쓰는 번호예요": "เลขที่นี้ใช้ในเครื่องอื่นแล้ว",
+    "반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.": "กรุณาใส่ห้อง เลขที่ และรหัสห้องเรียนก่อน",
+    "다 했어요! 선생님께 알렸어요.": "เสร็จแล้ว! ส่งถึงคุณครูแล้ว",
+    "활동지를 다 채웠어요!": "เขียนครบทุกช่องแล้ว!", "아래 <b>다 했어요</b>를 눌러요.": "กด <b>เสร็จแล้ว</b> ด้านล่าง", "그림으로 저장해 선생님께 보내요.": "บันทึกเป็นรูปภาพแล้วส่งให้คุณครู",
+  },
+};
+const tr = (ko) => (UI !== "ko" && UI_DICT[UI]?.[ko] !== undefined ? UI_DICT[UI][ko] : ko);
+
 async function route() {
+  UI = "ko";
   let hash = location.hash || "#/";
   // 교실 링크 교사 화면에서 "실시간 현황"으로 열면 주소 끝에 &room=…&key=… 가 붙어 옴 → 기억하고 주소에서 지움
   const hk = hash.match(/^(#[^&]*)&(.*)$/);
@@ -1677,26 +1706,29 @@ function sheetHtml(lesson, opts = {}) {
   const live = Boolean(LIVE.url) && isStudent;
   return `
     <section class="sheet${opts.big ? " is-big" : ""}${opts.readonly ? " is-readonly" : ""}" aria-label="${esc(sh.title || "활동지")}">
-      ${opts.big || opts.readonly ? "" : opts.partsPanel ? `<div class="sheet-head"><h2>${live ? "선생님과 연결" : "선생님께 보내기"}</h2><p>${live ? "교실 링크 참여 코드와 반·번호·모둠을 쓰면, 위 파트 활동에 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요." : "위 파트 활동에 쓴 내용을 그림으로 저장해 선생님께 보내요."}</p></div>` : `<div class="sheet-head"><h2>활동지</h2><p>${isStudent ? (live ? "여기에 바로 써요. 교실 링크 참여 코드와 반·번호를 쓰면, 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요." : "여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.") : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
+      ${opts.big || opts.readonly ? "" : opts.partsPanel ? `<div class="sheet-head"><h2>${live ? "선생님과 연결" : "선생님께 보내기"}</h2><p>${live ? "교실 링크 참여 코드와 반·번호·모둠을 쓰면, 위 파트 활동에 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요." : "위 파트 활동에 쓴 내용을 그림으로 저장해 선생님께 보내요."}</p></div>` : `<div class="sheet-head"><h2>${tr("활동지")}</h2><p>${isStudent ? (live ? tr("여기에 바로 써요. 교실 링크 참여 코드와 반·번호를 쓰면, 쓰는 내용이 선생님 화면에 자동으로 저장돼요. 다 하면 <b>다 했어요</b>를 눌러요.") : tr("여기에 바로 써요. 쓴 내용은 이 기기에 자동으로 저장돼요.")) : "학생 화면에서 학생이 바로 입력하는 활동지예요. 수업 모드에서 크게 띄울 수 있어요."}</p></div>`}
       ${opts.readonly ? "" : `<div class="sheet-me">
-        <label>6학년 <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="반"> 반</label>
+        ${UI === "ko" ? `<label>6학년 <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="반"> 반</label>
         <label><input type="text" data-me="no" value="${esc(me.no ?? "")}" inputmode="numeric" aria-label="번호"> 번</label>
-        <label><input type="text" data-me="group" value="${esc(me.group ?? "")}" inputmode="numeric" aria-label="모둠"> 모둠</label>
-        <label>이름 <input type="text" data-me="name" value="${esc(me.name ?? "")}" aria-label="이름" class="me-name"></label>
-        ${live ? `<label class="me-room">참여 코드 <input type="text" data-me="room" value="${esc(me.room ?? "")}" maxlength="6" autocapitalize="characters" aria-label="교실 링크 참여 코드" class="me-roomin"></label>
-          <span class="live-chip" data-live-chip>연결 안 됨</span>` : ""}
+        <label><input type="text" data-me="group" value="${esc(me.group ?? "")}" inputmode="numeric" aria-label="모둠"> 모둠</label>`
+        : `<label>${tr("6학년")} ${tr("반")} <input type="text" data-me="ban" value="${esc(me.ban ?? "")}" inputmode="numeric" aria-label="${tr("반")}"></label>
+        <label>${tr("번호")} <input type="text" data-me="no" value="${esc(me.no ?? "")}" inputmode="numeric" aria-label="${tr("번호")}"></label>
+        <label>${tr("모둠")} <input type="text" data-me="group" value="${esc(me.group ?? "")}" inputmode="numeric" aria-label="${tr("모둠")}"></label>`}
+        <label>${tr("이름")} <input type="text" data-me="name" value="${esc(me.name ?? "")}" aria-label="${tr("이름")}" class="me-name"></label>
+        ${live ? `<label class="me-room">${tr("참여 코드")} <input type="text" data-me="room" value="${esc(me.room ?? "")}" maxlength="6" autocapitalize="characters" aria-label="교실 링크 참여 코드" class="me-roomin"></label>
+          <span class="live-chip" data-live-chip>${tr("연결 안 됨")}</span>` : ""}
       </div>
-      ${live ? `<p class="sheet-privacy">이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.</p>` : ""}
+      ${live ? `<p class="sheet-privacy">${tr("이름은 이 기기에만 남고, 선생님께는 반·번호·모둠과 쓴 내용만 보내요.")}</p>` : ""}
       ${isStudent && (course.points ?? []).length ? `<div class="my-points" data-my-points hidden></div>` : ""}`}
       ${parts}
       ${opts.readonly ? "" : `<div class="sheet-progress" data-sheet-progress aria-live="polite"></div>
       <div class="sheet-tools">
-        ${live ? `<button class="btn-primary" type="button" data-sheet-submit>${icon.check}다 했어요</button>` : ""}
-        <button class="${live ? "btn-ghost" : "btn-primary"}" type="button" data-sheet-save>${icon.download}활동지 그림으로 저장</button>
-        ${opts.partsPanel ? "" : `<button class="btn-ghost" type="button" data-sheet-clear>다 지우기</button>`}
+        ${live ? `<button class="btn-primary" type="button" data-sheet-submit>${icon.check}${tr("다 했어요")}</button>` : ""}
+        <button class="${live ? "btn-ghost" : "btn-primary"}" type="button" data-sheet-save>${icon.download}${tr("활동지 그림으로 저장")}</button>
+        ${opts.partsPanel ? "" : `<button class="btn-ghost" type="button" data-sheet-clear>${tr("다 지우기")}</button>`}
         <span class="sheet-status" aria-live="polite"></span>
       </div>
-      <p class="notes-help">${live ? "<b>다 했어요</b>를 누르면 선생님 화면에 \"다 했어요 ✓\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요." : "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요."}</p>`}
+      <p class="notes-help">${live ? tr("<b>다 했어요</b>를 누르면 선생님 화면에 \"다 했어요 ✓\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요.") : tr("그림으로 저장해 모둠학습창이나 과제 게시판에 올려요.")}</p>`}
     </section>`;
 }
 
@@ -1710,7 +1742,7 @@ function isGroupPart(lesson, pi) {
 function partHtml(lesson, p, pi, st, opts = {}) {
   const v = (id) => st[id];
   const txt = (id, ph = "", lines = 1) => lines > 1
-    ? `<textarea data-id="${id}" rows="${lines}" placeholder="${esc(ph || "써 보세요.")}">${esc(v(id) ?? "")}</textarea>`
+    ? `<textarea data-id="${id}" rows="${lines}" placeholder="${esc(ph || tr("써 보세요."))}">${esc(v(id) ?? "")}</textarea>`
     : `<input type="text" data-id="${id}" value="${esc(v(id) ?? "")}" placeholder="${esc(ph)}">`;
   const item = (it, id) => {
     switch (it.type) {
@@ -1736,7 +1768,7 @@ function partHtml(lesson, p, pi, st, opts = {}) {
           `<button type="button" class="sh-card" data-choice="${id}" data-k="${k}" aria-pressed="${sel === k}">${o.img ? `<img src="${esc(o.img)}" alt="" width="70" height="84" loading="lazy">` : ""}<b>${esc(o.name)}</b><small>${esc(o.desc || "")}</small></button>`).join("")}</div></div>`;
       }
       case "scale": {
-        return `<table class="sh-table sh-scale"><thead><tr><th>점검할 내용</th>${it.options.map((o) => `<th>${esc(o)}</th>`).join("")}</tr></thead><tbody>
+        return `<table class="sh-table sh-scale"><thead><tr><th>${tr("점검할 내용")}</th>${it.options.map((o) => `<th>${esc(o)}</th>`).join("")}</tr></thead><tbody>
           ${it.rows.map((r, ri) => `<tr><th scope="row">${esc(r)}</th>${it.options.map((o, k) =>
             `<td><button type="button" class="sh-dot" data-choice="${id}.${ri}" data-k="${k}" aria-pressed="${v(`${id}.${ri}`) === k}" aria-label="${esc(o)}"></button></td>`).join("")}</tr>`).join("")}
           </tbody></table>`;
@@ -1776,7 +1808,7 @@ function partHtml(lesson, p, pi, st, opts = {}) {
       <header><h3>${esc(p.title)}</h3>
         ${p.stage ? `<span class="stage-chip" data-stage="${esc(p.stage[0])}">${esc(p.stage)}</span>` : ""}
         ${group ? `<span class="sh-who is-group">모둠이 함께 써요</span>` : ""}
-        ${p.slides?.length ? `<span class="sh-at">PPT ${p.slides.join("·")}번</span>` : ""}
+        ${p.slides?.length ? `<span class="sh-at">${tr("PPT")} ${p.slides.join("·")}${tr("번")}</span>` : ""}
       </header>
       ${p.note ? `<p class="sh-note">${esc(p.note)}</p>` : ""}
       ${group && LIVE.url && isStudent ? `<p class="sh-note sh-group-note">같은 모둠 친구가 쓴 내용이 몇 초 뒤 여기에도 나타나요.</p>` : ""}
@@ -1873,8 +1905,8 @@ async function liveSync(lesson, submit = false) {
   if (!LIVE.url || !isStudent) return;
   const w = liveWho();
   if (!w.ready) {
-    liveChip(w.room ? "반·번호를 써요" : "참여 코드를 써요", false);
-    if (submit) alert("반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.");
+    liveChip(w.room ? tr("반·번호를 써요") : tr("참여 코드를 써요"), false);
+    if (submit) alert(tr("반, 번호, 교실 링크 참여 코드를 먼저 써 주세요."));
     return;
   }
   const st = sheetState(lesson);
@@ -1882,24 +1914,24 @@ async function liveSync(lesson, submit = false) {
   Object.keys(st).forEach((id) => { if (id !== "_gt") fields[id] = st[id]; });
   Object.entries(st._gt ?? {}).forEach(([id, t]) => { if (isGroupPart(lesson, Number(id.match(/^p(\d+)\./)?.[1] ?? -1))) gfields[id] = { v: st[id] ?? null, t }; });
   try {
-    liveChip("보내는 중…", true);
+    liveChip(tr("보내는 중…"), true);
     const r = await liveCall({ action: "save", room: w.room, lesson: lesson.no, student: { ban: w.ban, no: w.no, group: w.group },
       dev: deviceId(), fields, gfields, progress: sheetProgress(lesson, st), submit,
       summary: submit ? sheetAnswers(lesson, st).map((x) => `${x.q}: ${x.a || "-"}`).join("\n") : undefined });
     LIVE.connected = true;
     if (r.gfields) applyGroup(lesson, r.gfields);
     receivePoints(r.points);
-    liveChip(r.submitted ? "다 했어요 ✓" : "선생님과 연결됨 · 자동 저장 중", true);
-    if (submit) { alert("다 했어요! 선생님께 알렸어요."); earnSheetBadge(lesson); }
+    liveChip(r.submitted ? tr("다 했어요 ✓") : tr("선생님과 연결됨 · 자동 저장 중"), true);
+    if (submit) { alert(tr("다 했어요! 선생님께 알렸어요.")); earnSheetBadge(lesson); }
   } catch (err) {
     LIVE.connected = false;
     if (err.status === 409) {
       // 다른 기기에서 이미 쓰는 반·번호: 한 번만 크게 알림
-      liveChip("다른 기기에서 쓰는 번호예요", false);
+      liveChip(tr("다른 기기에서 쓰는 번호예요"), false);
       if (submit || liveSync.warned !== `${w.room}/${w.ban}-${w.no}`) { liveSync.warned = `${w.room}/${w.ban}-${w.no}`; alert(err.message); }
       return;
     }
-    liveChip("연결 안 됨", false);
+    liveChip(tr("연결 안 됨"), false);
     if (submit) alert(`선생님께 알리지 못했어요. ${err.message}\n그림으로 저장해 두세요.`);
   }
 }
@@ -1967,8 +1999,8 @@ function paintSheetProgress(lesson, box) {
   el.innerHTML = `
     <div class="sp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
     <p>${full
-      ? `🎉 활동지를 다 채웠어요! ${live ? "아래 <b>다 했어요</b>를 눌러요." : "그림으로 저장해 선생님께 보내요."}`
-      : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
+      ? `🎉 ${tr("활동지를 다 채웠어요!")} ${live ? tr("아래 <b>다 했어요</b>를 눌러요.") : tr("그림으로 저장해 선생님께 보내요.")}`
+      : UI === "th" ? `เขียนแล้ว <b>${done}</b> จาก ${total} ช่อง` : `${total}칸 중 <b>${done}</b>칸 썼어요.`}</p>`;
   box.querySelector("[data-sheet-submit]")?.classList.toggle("is-ready", full);
   box.querySelector("[data-sheet-save]")?.classList.toggle("is-ready", full && !live);
 }
