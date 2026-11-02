@@ -517,7 +517,7 @@
        {
         "title": "Fill in the blanks",
         "slides": [
-         1
+         8
         ],
         "items": [
          {
@@ -564,9 +564,9 @@
          }
         ],
         "slides": [
-         2,
          3,
-         4
+         4,
+         5
         ]
        },
        {
@@ -587,29 +587,40 @@
          }
         ],
         "slides": [
-         1
+         8,
+         9
         ]
        }
       ]
      },
      "lang": "en",
      "teacher": {
-      "noPpt": true
+      "ppt": "files/intl/Now_Lets_act.pptx"
      },
      "slides": {
       "dir": "assets/slides/intl/gc4",
-      "count": 4,
+      "count": 9,
       "titles": [
-       "I want to help… I will reduce… I promise to help… We will protect…",
-       "세계 생태 시민 4컷 (WHO · WHY · WHAT · NOW)",
+       "Now, Let's act. — Global Citizenship Project",
+       "We can choose. Our choice changes the Earth. When will we start?",
+       "WHO · WHY · WHAT · NOW",
+       "Let's make a 4-cut photo story.",
+       "세계 생태 시민 4컷 예시",
        "AI Multi-Lang Photobooth — 영어 문장 넣기",
-       "포토부스 결과 — 한국어·태국어 자동 번역"
+       "포토부스 결과 — 한국어·태국어 자동 번역",
+       "I want to help… I will reduce… I promise to help… We will protect…",
+       "One World, One Friendship"
       ],
       "notes": [
-       "활동 1 프로젝트 돌아보기: 네 차시의 핵심 문장을 빈칸으로 다시 떠올려요.",
-       "활동 2 4컷 문장 구성 예시",
-       "선생님이 만든 포토부스 앱: 영어 문장을 넣으면 한국어·태국어로 자동 번역돼요.",
-       "활동 3 촬영하고 4컷 사진을 교환하며 다짐을 나눠요."
+       "",
+       "도입: 이전 차시 연결 \"We can choose. Our choice changes the Earth. So… when will we start?\"",
+       "활동 1 프로젝트 돌아보기: WHO → WHY → WHAT → NOW",
+       "활동 2 세계 생태 시민 4컷 문장 구성",
+       "1컷 WHO · 2컷 WHY · 3컷 WHAT · 4컷 NOW (지도안 속 예시 화면)",
+       "선생님이 만든 포토부스 앱: 영어 문장을 넣으면 한국어·태국어로 자동 번역돼요. (지도안 속 화면)",
+       "활동 3 촬영하고 4컷 사진을 교환해요.",
+       "정리: \"I will reduce plastic.\" \"I promise to help the Earth.\" \"We will protect the Earth.\"",
+       "프로젝트 마무리"
       ]
      }
     }
