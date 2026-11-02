@@ -1,10 +1,10 @@
 {
  "course": {
-  "title": "수업 사례 나눔",
-  "tagline": "선생님들이 나누는 인공지능 윤리 수업 사례",
+  "title": "AI 문해력",
+  "tagline": "인공지능을 공정하고 정직하게 쓰는 힘을 기르는 도덕 수업",
   "subject": "도덕",
   "grade": "초등 6학년",
-  "author": "",
+  "author": "장혜림",
   "lessonWord": "편",
   "slideCourse": true,
   "webSheetOnly": true,
@@ -15,7 +15,7 @@
   ],
   "license": {
    "name": "CC BY-NC 4.0",
-   "summary": "이 사이트의 글과 활동지는 출처(성장 MAP · 수업 사례 나눔)를 밝히면 자유롭게 고쳐 쓸 수 있으며, 영리 목적으로는 사용할 수 없습니다.",
+   "summary": "이 사이트의 글과 활동지는 출처(성장 MAP · AI 문해력)를 밝히면 자유롭게 고쳐 쓸 수 있으며, 영리 목적으로는 사용할 수 없습니다.",
    "url": "https://creativecommons.org/licenses/by-nc/4.0/deed.ko",
    "footer": "PPT의 그림·글꼴·사진은 각 권리자에게 권리가 있습니다."
   }
@@ -62,7 +62,7 @@
       "noPpt": true
      },
      "slides": {
-      "dir": "assets/slides/share/1",
+      "dir": "assets/slides/ai-literacy/1",
       "count": 12,
       "titles": [
        "도덕 4. 인공지능으로 일하는 미래 — 3차시",
@@ -269,7 +269,7 @@
       "noPpt": true
      },
      "slides": {
-      "dir": "assets/slides/share/2",
+      "dir": "assets/slides/ai-literacy/2",
       "count": 13,
       "titles": [
        "인공지능 로봇, 어떻게 사용해야 할까?",

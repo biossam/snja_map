@@ -40,10 +40,16 @@
       "file": "data/courses/intl-jp.json"
     },
     {
-      "id": "share",
+      "id": "ai-literacy",
+      "grade": 6,
+      "title": "AI 문해력",
+      "file": "data/courses/ai-literacy.json"
+    },
+    {
+      "id": "sharing",
       "grade": 6,
       "title": "수업 사례 나눔",
-      "file": "data/courses/share.json"
+      "file": "data/courses/sharing.json"
     }
   ]
 }

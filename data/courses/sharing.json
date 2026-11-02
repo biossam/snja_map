@@ -1,0 +1,60 @@
+{
+ "course": {
+  "title": "수업 사례 나눔",
+  "tagline": "성장 MAP으로 한 수업을 다른 선생님들과 나눠요",
+  "subject": "수업 사례",
+  "grade": "초등 6학년",
+  "author": "장혜림",
+  "lessonWord": "편",
+  "slideCourse": true,
+  "webSheetOnly": true,
+  "keyQuestion": "링크 하나로, 학생의 생각이 바로 보여요",
+  "keyLabel": "한 줄 소개",
+  "credits": [
+   "차시 배지: Google Gemini로 생성한 이미지"
+  ],
+  "license": {
+   "name": "CC BY-NC 4.0",
+   "summary": "출처(성장 MAP · 장혜림)를 밝히면 자유롭게 고쳐 쓸 수 있으며, 영리 목적으로는 사용할 수 없습니다.",
+   "url": "https://creativecommons.org/licenses/by-nc/4.0/deed.ko",
+   "footer": ""
+  }
+ },
+ "units": [
+  {
+   "id": "growth-map",
+   "title": "성장 MAP 수업 사례",
+   "lessons": [
+    {
+     "no": 1,
+     "title": "성장 MAP 수업 사례 나눔",
+     "topic": "동기(M) · 성찰(A) · 맞춤(P)이 한 수업 안에서 이어져요",
+     "color": {
+      "name": "하늘",
+      "hex": "#3A9BFA",
+      "ink": "#0B0B2E"
+     },
+     "steps": [
+      "M 동기: 핵심 질문과 칭찬포인트 목표로 시작해요.",
+      "A 성찰: 학생이 쓰는 생각을 실시간 현황으로 함께 봐요.",
+      "P 맞춤: 답을 보고 칭찬포인트·배지로 바로 피드백해요.",
+      "가입·설치 없이 링크 하나로 시작하고, 학생 이름은 서버로 보내지 않으며 수업이 끝나면 기록이 지워져요."
+     ],
+     "teacher": {
+      "noPpt": true
+     },
+     "slides": {
+      "dir": "assets/slides/sharing/1",
+      "count": 1,
+      "titles": [
+       "성장 MAP — 링크 하나로, 학생의 생각이 바로 보여요"
+      ],
+      "notes": [
+       "성장 MAP은 동기(M), 성찰(A), 맞춤(P)이 한 수업 안에서 이어지도록 만들었어요. 핵심 질문과 칭찬포인트 목표로 동기를 열고, 학생이 쓰는 생각을 실시간 현황으로 함께 보며 성찰하고, 답을 보고 칭찬포인트와 배지로 맞춤 피드백을 줍니다. 가입·설치 없이 링크 하나로 시작하고, 학생 이름은 서버로 보내지 않으며 수업이 끝나면 기록이 지워집니다."
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}
