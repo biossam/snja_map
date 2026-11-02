@@ -10,7 +10,7 @@
   "slideCourse": true,
   "credits": [
    "수업 PPT: 한국 학생용·태국 학생용 씨앗 편지",
-   "그림책: 『자, 맡겨주세요!』(이소영), 『플라스틱 섬』(이명애), 『빨간 지구 만들기 초록 지구 만들기』(한성민) — 그림책 장면은 사이트에 올리지 않았어요."
+   "그림책 『자, 맡겨주세요!』(이소영), 『플라스틱 섬』(이명애), 『빨간 지구 만들기 초록 지구 만들기』(한성민) — 그림책 장면과 표지는 저작권 때문에 흐리게 했어요."
   ],
   "license": {
    "name": "CC BY-NC 4.0",
@@ -80,6 +80,14 @@
           "label": "How do you feel?",
           "lines": 1
          }
+        ],
+        "slides": [
+         3,
+         4,
+         5,
+         6,
+         7,
+         8
         ]
        },
        {
@@ -94,6 +102,11 @@
           "label": "What did you make with clay?",
           "lines": 1
          }
+        ],
+        "slides": [
+         9,
+         10,
+         11
         ]
        },
        {
@@ -112,12 +125,54 @@
            "No, it is everyone's problem."
           ]
          }
+        ],
+        "slides": [
+         12,
+         13
         ]
        }
       ]
      },
      "lang": "en",
-     "teacher": {}
+     "teacher": {
+      "noPpt": true
+     },
+     "slides": {
+      "dir": "assets/slides/intl/gc1",
+      "count": 14,
+      "titles": [
+       "Who is in trouble? — Global Citizenship Project",
+       "Who needs help? Today, we will read a story.",
+       "Animals are coming. They have problems.",
+       "A bear came because it couldn't fall asleep during hibernation.",
+       "A white owl came because its feathers had turned brown.",
+       "A sea turtle came because no male turtles were being born.",
+       "A blue whale came because there were no krill left for it to eat.",
+       "Who is in trouble? Why are they suffering?",
+       "Which animal do you want to help? Let's make that animal with clay.",
+       "I want to help ( ).",
+       "I want to help ( ) because it is in danger.",
+       "This animal needs your help.",
+       "Animals asked for help. But… Is the doctor really helping?",
+       "Next time: Why are they suffering?"
+      ],
+      "notes": [
+       "도입 · 지도안 수업 PPT 1~2",
+       "그림책 『자, 맡겨주세요!』(이소영) 소개. 표지는 저작권 때문에 흐리게 했어요.",
+       "활동 1 그림책 함께 읽기 (PPT 3~4). 그림책 장면은 흐리게 하고 영어 문장만 남겼어요.",
+       "곰 · 겨울잠",
+       "올빼미 · 깃털 색 (PPT 5~6)",
+       "거북이 · 성비",
+       "고래 · 크릴 (PPT 7~8)",
+       "\"Who is in trouble? Why are they suffering?\" 칠판 정리: Animals → People → The Earth",
+       "활동 2 멸종위기 동물 클레이 만들기 (PPT 9~10)",
+       "활동 3 \"I want to help a ( ).\"",
+       "\"I want to help a ( ) because it is in danger.\" (PPT 11~12)",
+       "국제 비교: \"Is this happening in Korea? What about Thailand?\" → \"It is everyone's problem.\"",
+       "정리: 수업 핵심 메시지 (PPT 13~14)",
+       "다음 차시 예고: WHY 차시"
+      ]
+     }
     },
     {
      "no": 2,
@@ -328,6 +383,9 @@
           "label": "What is different on the green Earth?",
           "lines": 2
          }
+        ],
+        "slides": [
+         2
         ]
        },
        {
@@ -351,6 +409,15 @@
            "Price of Convenience (편리함의 대가)"
           ]
          }
+        ],
+        "slides": [
+         3,
+         4,
+         5,
+         6,
+         7,
+         8,
+         9
         ]
        },
        {
@@ -369,12 +436,43 @@
           "label": "What can we do in Korea? What can we do in Thailand?",
           "lines": 2
          }
+        ],
+        "slides": [
+         1
         ]
        }
       ]
      },
      "lang": "en",
-     "teacher": {}
+     "teacher": {
+      "noPpt": true
+     },
+     "slides": {
+      "dir": "assets/slides/intl/gc3",
+      "count": 9,
+      "titles": [
+       "What can we do? How can we help the Earth?",
+       "그림책 『빨간 지구 만들기 초록 지구 만들기』",
+       "누구지: 누군가 구할 때까지, 지구를 (시작 화면)",
+       "누구지 — 30개 문제 화면",
+       "결과: 완벽한 수호자",
+       "결과: 훌륭한 실천가",
+       "결과: 위험한 타협",
+       "결과: 편리함의 대가",
+       "마지막 화면 — 생태계 생존 지표"
+      ],
+      "notes": [
+       "도입: \"This is our problem. So… what can we do?\"",
+       "활동 1 그림책 함께 읽기. 책 표지는 저작권 때문에 흐리게 했어요.",
+       "활동 2 [태블릿] 선생님이 만든 누구지 앱. 한국어·영어·태국어를 고를 수 있어요.",
+       "멸종위기 동물 30마리를 살릴 30개의 선택",
+       "",
+       "",
+       "",
+       "",
+       "\"Which Earth do you choose?\" Reduce · Reuse · Recycle · Change our behavior"
+      ]
+     }
     },
     {
      "no": 4,
@@ -417,6 +515,30 @@
       "title": "Lesson 4 Worksheet",
       "parts": [
        {
+        "title": "Fill in the blanks",
+        "slides": [
+         1
+        ],
+        "items": [
+         {
+          "type": "fill",
+          "text": "I want to help a(n) ({})."
+         },
+         {
+          "type": "fill",
+          "text": "I will reduce ({})."
+         },
+         {
+          "type": "fill",
+          "text": "I promise to help the ({})."
+         },
+         {
+          "type": "fill",
+          "text": "We will protect the ({})."
+         }
+        ]
+       },
+       {
         "title": "My 4-cut story",
         "note": "Write one sentence for each cut. Then type them into the photo booth app.",
         "items": [
@@ -440,6 +562,11 @@
           "label": "NOW — What will I do?",
           "lines": 1
          }
+        ],
+        "slides": [
+         2,
+         3,
+         4
         ]
        },
        {
@@ -458,12 +585,33 @@
           "label": "Why is it important?",
           "lines": 2
          }
+        ],
+        "slides": [
+         1
         ]
        }
       ]
      },
      "lang": "en",
-     "teacher": {}
+     "teacher": {
+      "noPpt": true
+     },
+     "slides": {
+      "dir": "assets/slides/intl/gc4",
+      "count": 4,
+      "titles": [
+       "I want to help… I will reduce… I promise to help… We will protect…",
+       "세계 생태 시민 4컷 (WHO · WHY · WHAT · NOW)",
+       "AI Multi-Lang Photobooth — 영어 문장 넣기",
+       "포토부스 결과 — 한국어·태국어 자동 번역"
+      ],
+      "notes": [
+       "활동 1 프로젝트 돌아보기: 네 차시의 핵심 문장을 빈칸으로 다시 떠올려요.",
+       "활동 2 4컷 문장 구성 예시",
+       "선생님이 만든 포토부스 앱: 영어 문장을 넣으면 한국어·태국어로 자동 번역돼요.",
+       "활동 3 촬영하고 4컷 사진을 교환하며 다짐을 나눠요."
+      ]
+     }
     }
    ]
   },
