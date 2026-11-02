@@ -38,6 +38,12 @@
       "grade": 6,
       "title": "국제 교류 · 일본",
       "file": "data/courses/intl-jp.json"
+    },
+    {
+      "id": "share",
+      "grade": 6,
+      "title": "수업 사례 나눔",
+      "file": "data/courses/share.json"
     }
   ]
 }
