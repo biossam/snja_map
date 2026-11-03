@@ -1600,7 +1600,7 @@ function deviceId() {
 }
 const readJSON = (k) => { try { return JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch { return {}; } };
 const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
-const slideSrc = (lesson, k) => `${lesson.slides.dir}/${k}.jpg`;
+const slideSrc = (lesson, k) => `${lesson.slides.dir}/${k}.jpg${lesson.slides.v ? `?v=${encodeURIComponent(lesson.slides.v)}` : ""}`;
 
 /* ---------- PPT 슬라이드 보기 (차시 화면) ---------- */
 const slidesVisible = (lesson) => Boolean(lesson.slides?.count) && !(isStudent && course.slidesTeacherOnly);

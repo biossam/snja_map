@@ -142,7 +142,7 @@
       "noPpt": true
      },
      "slides": {
-      "dir": "assets/slides/intl/gc1",
+      "dir": "assets/slides/intl/gc1", "v": "20261103c",
       "count": 14,
       "titles": [
        "Who is in trouble? — Global Citizenship Project",
@@ -307,7 +307,7 @@
       "ppt": "files/intl/Why_are_they_suffering.pptx"
      },
      "slides": {
-      "dir": "assets/slides/intl/gc2",
+      "dir": "assets/slides/intl/gc2", "v": "20261103c",
       "count": 9,
       "titles": [
        "Why are they suffering?",
@@ -602,7 +602,7 @@
       "ppt": "files/intl/Now_Lets_act.pptx"
      },
      "slides": {
-      "dir": "assets/slides/intl/gc4",
+      "dir": "assets/slides/intl/gc4", "v": "20261103c",
       "count": 9,
       "titles": [
        "Now, let's act. — Global Citizenship Project",
