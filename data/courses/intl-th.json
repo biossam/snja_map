@@ -50,14 +50,14 @@
       "도입: \"Today, we will read a story. Many animals are in trouble. Who needs help?\" 감정 질문 \"How do you feel?\"",
       "활동 1 그림책 함께 읽기: 곰, 올빼미, 거북이, 고래가 문제를 가지고 찾아오는 장면을 보며 \"Who is in trouble?\"",
       "활동 2 멸종위기 동물 조사하고 클레이로 만들기: \"Which animal do you want to help? Let's make that animal with clay.\"",
-      "활동 3 내가 도와주고 싶은 멸종위기 동물: \"I want to help a ( ) because it is in danger.\" 발표",
+      "활동 3 내가 도와주고 싶은 멸종위기 동물: \"I want to help a(n) ( ) because it is in danger.\" 발표",
       "국제 비교 (한국·태국): \"Is this happening in Korea? What about Thailand?\" → \"It is everyone's problem.\"",
       "정리: 다음 차시 예고 \"But… why are they suffering?\""
      ],
      "questions": [
       "Who is in trouble?",
       "How do you feel?",
-      "Is this only animals' problem?"
+      "Is this only the animals' problem?"
      ],
      "prep": [
       "설명보다 질문 중심으로 진행해요.",
@@ -99,7 +99,7 @@
         "items": [
          {
           "type": "fill",
-          "text": "I want to help a {} because it is in danger."
+          "text": "I want to help a(n) {} because it is in danger."
          },
          {
           "type": "text",
@@ -123,7 +123,7 @@
          },
          {
           "type": "choice",
-          "label": "Is this only animals' problem?",
+          "label": "Is this only the animals' problem?",
           "options": [
            "Yes, it is.",
            "No, it is everyone's problem."
@@ -148,14 +148,14 @@
        "Who is in trouble? — Global Citizenship Project",
        "Who needs help? Today, we will read a story.",
        "Animals are coming. They have problems.",
-       "A bear came because it couldn't fall asleep during hibernation.",
+       "A bear came because it couldn't sleep through the winter.",
        "A white owl came because its feathers had turned brown.",
        "A sea turtle came because no male turtles were being born.",
        "A blue whale came because there were no krill left for it to eat.",
        "Who is in trouble? Why are they suffering?",
        "Which animal do you want to help? Let's make that animal with clay.",
-       "I want to help ( ).",
-       "I want to help ( ) because it is in danger.",
+       "I want to help a(n) ( ).",
+       "I want to help a(n) ( ) because it is in danger.",
        "This animal needs your help.",
        "Animals asked for help. But… Is the doctor really helping?",
        "Next time: Why are they suffering?"
@@ -170,8 +170,8 @@
        "고래 · 크릴 (PPT 7~8)",
        "칠판 정리: 북극곰 · 개구리 · 올빼미의 문제 → 더워져서 겨울잠을 못 잠, 먹이 부족, 환경 변화. \"The ( ) cannot sleep. The ( ) is changing color. The weather is too ( ).\"",
        "활동 2 멸종위기 동물 클레이 만들기 (PPT 9~10)",
-       "활동 3 \"I want to help a ( ).\"",
-       "\"I want to help a ( ) because it is in danger.\" (PPT 11~12)",
+       "활동 3 \"I want to help a(n) ( ).\"",
+       "\"I want to help a(n) ( ) because it is in danger.\" (PPT 11~12)",
        "국제 비교: \"Is this happening in Korea? What about Thailand?\" → \"It is everyone's problem.\"",
        "정리: 수업 핵심 메시지. 국제 비교 \"In Korea, we have air pollution.\" \"In Thailand, we have plastic waste.\"",
        "다음 차시 예고: WHY 차시"
@@ -200,7 +200,7 @@
      ],
      "steps": [
       "도입: \"Animals are in trouble. They need help. But… why?\"",
-      "활동 1 그림책 함께 읽기: 바다에 떠다니는 쓰레기, 동물과 플라스틱의 관계. \"Is this natural OR is this made by people?\" → \"People made it.\"",
+      "활동 1 그림책 함께 읽기: 바다에 떠다니는 쓰레기, 동물과 플라스틱의 관계. \"Is this natural, or is this made by people?\" → \"People made it.\"",
       "활동 2 바다 유리로 키링 만들기: \"This is sea glass. It was trash.\" \"Where did it come from?\" → \"It was in the ocean.\"",
       "활동 3 내가 만든 키링은 아름답지만 ( ): \"This happens because people use too much plastic.\"",
       "한국·태국: \"Do you see trash in Korea? What about Thailand?\"",
@@ -311,7 +311,7 @@
       "count": 9,
       "titles": [
        "Why are they suffering?",
-       "What do you see? Is this natural or made by people?",
+       "What do you see? Is this natural, or is this made by people?",
        "Plastic in the ocean · People throw trash · Too much plastic · Human behavior",
        "The trash doesn't disappear. It stays in the ocean.",
        "This is sea glass. It was trash.",
@@ -492,7 +492,7 @@
      "student": {
       "title": "Now, let's act.",
       "topic": "WHO → WHY → WHAT → NOW: my 4-cut photo story",
-      "goal": "I can tell my action plan with \"I will ~ / I promise to ~\"."
+      "goal": "I can talk about my action plan with \"I will ~ / I promise to ~\"."
      },
      "materials": [
       "포토부스 앱(영어 문장 → 한국어·태국어 자동 번역)",
@@ -605,7 +605,7 @@
       "dir": "assets/slides/intl/gc4",
       "count": 9,
       "titles": [
-       "Now, Let's act. — Global Citizenship Project",
+       "Now, let's act. — Global Citizenship Project",
        "We can choose. Our choice changes the Earth. When will we start?",
        "WHO · WHY · WHAT · NOW",
        "Let's make a 4-cut photo story.",

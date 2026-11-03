@@ -1447,9 +1447,9 @@ UI_DICT.en = {
   "<b>다 했어요</b>를 누르면 선생님 화면에 \"다 했어요 ✓\"로 표시돼요. 그림으로 저장해 모둠학습창에 올릴 수도 있어요.": "Press <b>Done!</b> and your teacher will see ✓. You can also save it as an image.",
   "그림으로 저장해 모둠학습창이나 과제 게시판에 올려요.": "Save it as an image and send it to your teacher.",
   "연결 안 됨": "Not connected", "보내는 중…": "Sending…", "선생님과 연결됨 · 자동 저장 중": "Connected · auto-saving",
-  "다 했어요 ✓": "Done ✓", "반·번호를 써요": "Enter class and number", "참여 코드를 써요": "Enter the room code", "다른 기기에서 쓰는 번호예요": "This number is used on another device",
+  "다 했어요 ✓": "Done ✓", "반·번호를 써요": "Enter class and number", "참여 코드를 써요": "Enter the room code", "다른 기기에서 쓰는 번호예요": "This number is already in use on another device",
   "반, 번호, 교실 링크 참여 코드를 먼저 써 주세요.": "Please enter your class, number and room code first.",
-  "다 했어요! 선생님께 알렸어요.": "Done! Your teacher has been told.",
+  "다 했어요! 선생님께 알렸어요.": "Done! Your teacher can see it now.",
   "활동지를 다 채웠어요!": "You filled in everything!", "아래 <b>다 했어요</b>를 눌러요.": "Press <b>Done!</b> below.", "그림으로 저장해 선생님께 보내요.": "Save it as an image and send it to your teacher.",
 };
 const tr = (ko) => (UI !== "ko" && UI_DICT[UI]?.[ko] !== undefined ? UI_DICT[UI][ko] : ko);
