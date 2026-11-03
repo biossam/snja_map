@@ -79,6 +79,10 @@
           "type": "text",
           "label": "How do you feel?",
           "lines": 1
+         },
+         {
+          "type": "fill",
+          "text": "The ({}) cannot sleep. The ({}) is changing color. The weather is too ({})."
          }
         ],
         "slides": [
@@ -159,17 +163,17 @@
       "notes": [
        "도입 · 지도안 수업 PPT 1~2",
        "그림책 『자, 맡겨주세요!』(이소영) 소개. 표지는 저작권 때문에 흐리게 했어요.",
-       "활동 1 그림책 함께 읽기 (PPT 3~4). 그림책 장면은 흐리게 하고 영어 문장만 남겼어요.",
+       "활동 1 그림책 함께 읽기. 80억 명의 사람들이 오 박사를 만나러 모였고, 걱정 많은 동물들도 찾아왔어요. 그림책 장면은 흐리게 하고 영어 문장만 남겼어요.",
        "곰 · 겨울잠",
        "올빼미 · 깃털 색 (PPT 5~6)",
        "거북이 · 성비",
        "고래 · 크릴 (PPT 7~8)",
-       "\"Who is in trouble? Why are they suffering?\" 칠판 정리: Animals → People → The Earth",
+       "칠판 정리: 북극곰 · 개구리 · 올빼미의 문제 → 더워져서 겨울잠을 못 잠, 먹이 부족, 환경 변화. \"The ( ) cannot sleep. The ( ) is changing color. The weather is too ( ).\"",
        "활동 2 멸종위기 동물 클레이 만들기 (PPT 9~10)",
        "활동 3 \"I want to help a ( ).\"",
        "\"I want to help a ( ) because it is in danger.\" (PPT 11~12)",
        "국제 비교: \"Is this happening in Korea? What about Thailand?\" → \"It is everyone's problem.\"",
-       "정리: 수업 핵심 메시지 (PPT 13~14)",
+       "정리: 수업 핵심 메시지. 국제 비교 \"In Korea, we have air pollution.\" \"In Thailand, we have plastic waste.\"",
        "다음 차시 예고: WHY 차시"
       ]
      }
